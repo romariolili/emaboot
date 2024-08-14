@@ -13,7 +13,7 @@ import pandas as pd
 app = Flask(__name__)
 
 # Caminho do arquivo no Google Drive
-file_path = '/content/teste 1.xlsx'
+file_path = 'teste 1.xlsx'
 
 # Carregar a planilha Excel
 df = pd.read_excel(file_path)
