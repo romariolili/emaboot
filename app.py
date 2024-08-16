@@ -18,9 +18,10 @@ file_path = 'teste 1.xlsx'
 df = pd.read_excel(file_path)
 
 def search_in_spreadsheet(term):
-    results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
+    # Certifica-se de que a busca considera o termo em qualquer parte da célula, independentemente de como as palavras estão separadas
+    results = df[df['Palavras chaves'].str.contains(term, case=False, na=False, regex=True)]
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam']].to_dict('records')
+        return results['Título do documento'].tolist()
     else:
         return []
 
