@@ -38,11 +38,6 @@ def search_in_spreadsheet(term):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global chat_history  # Acessa a variável global chat_history
-    
-    if request.method == 'GET' and not request.args.get('title'):
-        # Zera o histórico de chat a cada nova visita direta
-        chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
-
     if request.method == 'POST':
         user_input = request.form['user_input']
         
@@ -59,6 +54,7 @@ def home():
             chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
     
     return render_template_string('''
+        <h1><img src="/static/images/DIPLAN.png" alt="DIPLAN Logo" style="width: 200px;"></h1>
         <h1>Emabot da Diplan</h1>
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
             {% for message in chat_history %}
@@ -84,19 +80,9 @@ def get_link():
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
     # Renderiza a mesma página inicial para permitir novas interações
-    return render_template_string('''
-        <h1>Emabot da Diplan</h1>
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            {% for message in chat_history %}
-                <p>{{ message | safe }}</p>
-            {% endfor %}
-        </div>
-        <form method="post" action="/">
-            <label for="user_input">Digite sua mensagem:</label><br>
-            <input type="text" id="user_input" name="user_input" style="width:80%">
-            <input type="submit" value="Enviar">
-        </form>
-    ''', chat_history=chat_history)
+    return home()
 
 if __name__ == "__main__":
+    # Inicializa a conversa com a nova saudação
+    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
