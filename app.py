@@ -15,11 +15,18 @@ app = Flask(__name__)
 # Caminho do arquivo no servidor
 file_path = 'teste 1.xlsx'
 
-# Carregar a planilha Excel
-df = pd.read_excel(file_path)
+# Verifica se o arquivo existe
+if os.path.exists(file_path):
+    # Carregar a planilha Excel
+    df = pd.read_excel(file_path)
+else:
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam"])
 
 # Emoji de rosto humano
 face_emoji = "👤"
+
+# Inicializa o histórico de chat
+chat_history = []
 
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
@@ -30,13 +37,13 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global face_emoji
+    global chat_history
     if request.method == 'POST':
         user_input = request.form['user_input']
         
         # Substitui o texto do usuário pelo emoji de rosto humano
-        user_message = face_emoji
-        chat_history.append(f"{user_message}: {user_input}")
+        user_message = f"{face_emoji}: {user_input}"
+        chat_history.append(user_message)
         
         results = search_in_spreadsheet(user_input)
         if results:
@@ -78,6 +85,5 @@ def get_link():
 
 if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
-    chat_history = []
     chat_history.append("🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?")
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
