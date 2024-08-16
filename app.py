@@ -60,7 +60,7 @@ def home():
                 <p>{{ message | safe }}</p>
             {% endfor %}
         </div>
-        <form method="post">
+        <form method="post" action="/">
             <label for="user_input">Digite sua mensagem:</label><br>
             <input type="text" id="user_input" name="user_input" style="width:80%">
             <input type="submit" value="Enviar">
@@ -85,4 +85,5 @@ if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
     chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
