@@ -69,19 +69,16 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    global chat_history  # Acessa a variável global chat_history
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
-        chat_history = [f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>"]
-        return home()
+        chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
     else:
-        return render_template_string('''
-            <h1>Emabot da Diplan</h1>
-            <p><b>🤖 Emabot:</b> Link não encontrado para o título selecionado.</p>
-            <br><a href="/">Voltar</a>
-        ''')
+        chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
+    
+    # Renderiza a mesma página inicial para permitir novas interações
+    return home()
 
 if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
