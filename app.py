@@ -19,7 +19,7 @@ file_path = 'teste 1.xlsx'
 df = pd.read_excel(file_path)
 
 def search_in_spreadsheet(term):
-    if not isinstance(term, str):
+    if not isinstance(term, str) or not term:
         return []
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
@@ -36,7 +36,7 @@ def get_link_by_title(title):
 
 @app.route('/')
 def home():
-    return render_template_string(open('index.html').read())
+    return render_template_string(open('index.html').read(), response=None)
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot_interaction():
