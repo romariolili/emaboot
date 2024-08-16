@@ -26,6 +26,7 @@ else:
 face_emoji = "👤"
 
 def search_in_spreadsheet(term):
+    term = term.lower()  # Converte a entrada do usuário para minúsculas
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam']].to_dict('records')
@@ -35,10 +36,10 @@ def search_in_spreadsheet(term):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave."]
+    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."]
 
     if request.method == 'POST':
-        user_input = request.form['user_input']
+        user_input = request.form['user_input'].strip().lower()  # Converte a entrada do usuário para minúsculas e remove espaços em branco
         
         # Substitui o texto do usuário pelo emoji de rosto humano
         user_message = f"{face_emoji}: {user_input}"
@@ -72,7 +73,7 @@ def home():
 @app.route('/get_link', methods=['GET'])
 def get_link():
     # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave."]
+    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."]
 
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
@@ -102,3 +103,4 @@ def get_link():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
