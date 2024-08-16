@@ -35,7 +35,7 @@ def search_in_spreadsheet(term):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
+    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave."]
 
     if request.method == 'POST':
         user_input = request.form['user_input']
@@ -72,7 +72,7 @@ def home():
 @app.route('/get_link', methods=['GET'])
 def get_link():
     # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
+    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave."]
 
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
