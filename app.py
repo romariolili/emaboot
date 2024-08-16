@@ -11,69 +11,58 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Caminho do arquivo no servidor
-file_path = 'teste 1.xlsx'
-
 # Carregar a planilha Excel
+file_path = 'teste 1.xlsx'
 df = pd.read_excel(file_path)
 
 def search_in_spreadsheet(term):
-    # Certifica-se de que a busca considera o termo em qualquer parte da célula, independentemente de como as palavras estão separadas
+    # Certifica-se de que a busca considera o termo em qualquer parte da célula
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False, regex=True)]
     if not results.empty:
         return results['Título do documento'].tolist()
     else:
         return []
 
-@app.route('/', methods=['GET', 'POST'])
+def get_link_by_title(title):
+    result = df[df['Título do documento'] == title]
+    if not result.empty:
+        return result['Link Qualyteam'].values[0]
+    else:
+        return None
+
+@app.route("/", methods=["GET", "POST"])
 def home():
-    if request.method == 'POST':
-        term = request.form['search']
-        results = search_in_spreadsheet(term)
-        if results:
-            return render_template_string('''
-                <h1>Emaboot Chatbot</h1>
-                <p><b>🤖 Emaboot:</b> Documentos encontrados:</p>
+    if request.method == "POST":
+        search_term = request.form["search_term"]
+        results = search_in_spreadsheet(search_term)
+        return render_template_string('''
+            <h1>Emaboot Chatbot</h1>
+            <form method="post">
+                <label>🤖 Emaboot: Qual documento procura hoje?</label><br>
+                <input type="text" name="search_term">
+                <input type="submit" value="Enviar">
+            </form>
+            {% if results %}
+                <p>🤖 Emaboot: Documentos encontrados:</p>
                 <ul>
                 {% for result in results %}
-                    <li><a href="/get_link?title={{ result['Título do documento'] }}">{{ result['Título do documento'] }}</a></li>
+                    <li>{{ loop.index }}. {{ result }}</li>
                 {% endfor %}
                 </ul>
-                <br><a href="/">Voltar</a>
-            ''', results=results)
-        else:
-            return render_template_string('''
-                <h1>Emaboot Chatbot</h1>
-                <p><b>🤖 Emaboot:</b> Nenhum documento encontrado com essas palavras-chave.</p>
-                <br><a href="/">Voltar</a>
-            ''')
+                <a href="/">Voltar</a>
+            {% else %}
+                <p>🤖 Emaboot: Nenhum documento encontrado com essas palavras-chave.</p>
+                <a href="/">Voltar</a>
+            {% endif %}
+        ''', results=results)
     return render_template_string('''
         <h1>Emaboot Chatbot</h1>
         <form method="post">
-            <label for="search">🤖 Emaboot: Qual documento procura hoje?</label><br><br>
-            <input type="text" id="search" name="search">
+            <label>🤖 Emaboot: Qual documento procura hoje?</label><br>
+            <input type="text" name="search_term">
             <input type="submit" value="Enviar">
         </form>
     ''')
 
-@app.route('/get_link', methods=['GET'])
-def get_link():
-    title = request.args.get('title')
-    result = df[df['Título do documento'] == title]
-    if not result.empty:
-        link = result['Link Qualyteam'].values[0]
-        return render_template_string('''
-            <h1>Emaboot Chatbot</h1>
-            <p><b>🤖 Emaboot:</b> Aqui está o link para '{{ title }}':</p>
-            <a href="{{ link }}" target="_blank">{{ link }}</a>
-            <br><br><a href="/">Voltar</a>
-        ''', title=title, link=link)
-    else:
-        return render_template_string('''
-            <h1>Emaboot Chatbot</h1>
-            <p><b>🤖 Emaboot:</b> Link não encontrado para o título selecionado.</p>
-            <br><a href="/">Voltar</a>
-        ''')
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
