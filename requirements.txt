@@ -3,4 +3,4 @@ pandas
 gunicorn
 openpyxl
 werkzeug
-
+pip>=24.2
