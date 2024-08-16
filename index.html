@@ -6,15 +6,15 @@
     <title>Emaboot Chatbot</title>
 </head>
 <body>
-    <!-- Aqui está o código para adicionar a imagem -->
+    <!-- Adicionar a imagem -->
     <div style="text-align: center;">
-        <img src="{{ url_for('static', filename='images/nomedaimagem.png') }}" alt="Emaboot Logo" style="width: 100%; max-width: 800px;">
+        <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Emaboot Logo" style="width: 100%; max-width: 800px;">
     </div>
     
     <!-- Título do chatbot -->
     <h1 style="text-align: center;">Emaboot Chatbot</h1>
 
-    <!-- Resto do conteúdo da página -->
+    <!-- Formulário e conteúdo -->
     <form method="POST" action="/chatbot">
         <label for="input">Digite a palavra-chave:</label>
         <input type="text" id="input" name="input">
