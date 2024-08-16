@@ -1,37 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emaboot Chatbot</title>
 </head>
 <body>
-    <!-- Adicionar a imagem -->
-    <div style="text-align: center;">
-        <img src="/static/images/DIPLAN.png" alt="Emaboot Logo" style="width: 100%; max-width: 800px;">
+    <div style="text-align:center;">
+        <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN" width="400">
+        <h1>Emaboot Chatbot</h1>
+        <form method="POST" action="/">
+            <label for="term">🤖 Emaboot: Qual documento procura hoje?</label><br><br>
+            <input type="text" id="term" name="term"><br><br>
+            <input type="submit" value="Enviar">
+        </form>
     </div>
-    
-    <!-- Título do chatbot -->
-    <h1 style="text-align: center;">Emaboot Chatbot</h1>
-
-    <!-- Formulário e conteúdo -->
-    <form method="POST" action="/chatbot">
-        <label for="input">Digite a palavra-chave:</label>
-        <input type="text" id="input" name="input">
-        <button type="submit">Enviar</button>
-    </form>
 
     {% if results %}
-        <h2>🤖 Emaboot: Documentos encontrados:</h2>
-        <ul>
-        {% for result in results %}
-            <li>{{ loop.index }}. <a href="/link/{{ result }}">{{ result }}</a></li>
-        {% endfor %}
-        </ul>
-        <a href="/">Voltar</a>
-    {% elif message %}
-        <p>{{ message }}</p>
-        <a href="/">Voltar</a>
+        <div style="text-align:center;">
+            <h3>🤖 Emaboot: Documentos encontrados:</h3>
+            <ul>
+            {% for result in results %}
+                <li><a href="{{ url_for('get_link', title=result) }}">{{ result }}</a></li>
+            {% endfor %}
+            </ul>
+            <a href="/">Voltar</a>
+        </div>
     {% endif %}
 </body>
 </html>
