@@ -38,6 +38,11 @@ def search_in_spreadsheet(term):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global chat_history  # Acessa a variável global chat_history
+    
+    if request.method == 'GET':
+        # Zera o histórico de chat a cada nova visita
+        chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
+
     if request.method == 'POST':
         user_input = request.form['user_input']
         
@@ -82,8 +87,6 @@ def get_link():
     return home()
 
 if __name__ == "__main__":
-    # Inicializa a conversa com a nova saudação
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 
