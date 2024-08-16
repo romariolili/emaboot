@@ -36,7 +36,26 @@ def get_link_by_title(title):
 
 @app.route('/')
 def home():
-    return render_template_string(open('index.html').read(), response=None)
+    html_content = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Emaboot Chatbot</title>
+    </head>
+    <body>
+        <h1>Emaboot Chatbot</h1>
+        <form action="/chatbot" method="post">
+            <label for="input">Digite o termo de busca:</label><br><br>
+            <input type="text" id="input" name="input"><br><br>
+            <input type="submit" value="Enviar">
+        </form>
+        {% if response %}
+            <p>{{ response | safe }}</p>
+        {% endif %}
+    </body>
+    </html>
+    '''
+    return render_template_string(html_content)
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot_interaction():
