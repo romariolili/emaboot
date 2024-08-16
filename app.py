@@ -25,6 +25,9 @@ else:
 # Emoji de rosto humano
 face_emoji = "👤"
 
+# Inicializa o histórico de chat como uma lista vazia
+chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
+
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
@@ -34,7 +37,7 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]  # Reseta o histórico a cada carregamento da página
+    global chat_history  # Acessa a variável global chat_history
 
     if request.method == 'POST':
         user_input = request.form['user_input']
@@ -70,17 +73,17 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
+    global chat_history  # Certifique-se de que o histórico de chat seja acessível
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
-    link_message = ""
     
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
-        link_message = f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>"
+        chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
     else:
-        link_message = "🤖 Emabot: Link não encontrado para o título selecionado."
+        chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
-    # Redireciona de volta para a página principal e exibe o link após a saudação inicial
+    # Redireciona de volta para a página principal e mantém o histórico de chat
     return redirect(url_for('home'))
 
 if __name__ == "__main__":
