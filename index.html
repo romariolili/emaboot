@@ -4,31 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emaboot Chatbot</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        h1 {
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
-    <!-- Adicionando a imagem acima do título -->
-    <img src="path/to/your/image.png" alt="DIPLAN Logo">
-    <h1>Emaboot Chatbot</h1>
+    <!-- Aqui está o código para adicionar a imagem -->
+    <div style="text-align: center;">
+        <img src="{{ url_for('static', filename='images/nomedaimagem.png') }}" alt="Emaboot Logo" style="width: 100%; max-width: 800px;">
+    </div>
+    
+    <!-- Título do chatbot -->
+    <h1 style="text-align: center;">Emaboot Chatbot</h1>
 
-    <!-- Restante do conteúdo -->
+    <!-- Resto do conteúdo da página -->
     <form method="POST" action="/chatbot">
-        <label for="query">Digite as palavras-chave para buscar documentos:</label><br>
-        <input type="text" id="query" name="query" required>
-        <button type="submit">Buscar</button>
+        <label for="input">Digite a palavra-chave:</label>
+        <input type="text" id="input" name="input">
+        <button type="submit">Enviar</button>
     </form>
+
+    {% if results %}
+        <h2>🤖 Emaboot: Documentos encontrados:</h2>
+        <ul>
+        {% for result in results %}
+            <li>{{ loop.index }}. <a href="/link/{{ result }}">{{ result }}</a></li>
+        {% endfor %}
+        </ul>
+        <a href="/">Voltar</a>
+    {% elif message %}
+        <p>{{ message }}</p>
+        <a href="/">Voltar</a>
+    {% endif %}
 </body>
 </html>
