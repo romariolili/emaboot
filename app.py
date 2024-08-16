@@ -12,15 +12,12 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Caminho do arquivo Excel
-file_path = 'teste 1.xlsx'
-
 # Carregar a planilha Excel
+file_path = 'teste 1.xlsx'  # Certifique-se de que o arquivo esteja na mesma pasta que o app.py
 df = pd.read_excel(file_path)
 
+# Funções adaptadas
 def search_in_spreadsheet(term):
-    if not isinstance(term, str) or not term:
-        return []
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
         return results['Título do documento'].tolist()
@@ -34,53 +31,61 @@ def get_link_by_title(title):
     else:
         return None
 
-@app.route('/')
+# Rotas Flask
+@app.route('/', methods=['GET'])
 def home():
-    html_content = '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Emaboot Chatbot</title>
-    </head>
-    <body>
-        <h1>Emaboot Chatbot</h1>
-        <form action="/chatbot" method="post">
-            <label for="input">Digite o termo de busca:</label><br><br>
-            <input type="text" id="input" name="input"><br><br>
-            <input type="submit" value="Enviar">
-        </form>
-        {% if response %}
-            <p>{{ response | safe }}</p>
-        {% endif %}
-    </body>
-    </html>
-    '''
-    return render_template_string(html_content)
+    return render_template_string('''
+        <html>
+            <head>
+                <title>Emaboot Chatbot</title>
+            </head>
+            <body>
+                <h1>Emaboot Chatbot</h1>
+                <form action="/chatbot" method="POST">
+                    <label for="query">Digite o termo que você procura:</label>
+                    <input type="text" id="query" name="query" required>
+                    <button type="submit">Buscar</button>
+                </form>
+            </body>
+        </html>
+    ''')
 
 @app.route('/chatbot', methods=['POST'])
 def chatbot_interaction():
-    user_input = request.form.get("input", "")
-    
-    term = user_input.strip()
+    term = request.form.get('query')
     results = search_in_spreadsheet(term)
     
     if results:
-        response = "🤖 Emaboot: Documentos encontrados:<br>"
+        response = "<h2>🤖 Emaboot: Documentos encontrados:</h2><ul>"
         for i, title in enumerate(results, 1):
-            response += f"{i}. {title}<br>"
-        return render_template_string(open('index.html').read(), response=response)
+            response += f"<li>{i}. {title}</li>"
+        response += "</ul>"
     else:
-        return render_template_string(open('index.html').read(), response="🤖 Emaboot: Nenhum documento encontrado com essas palavras-chave.")
+        response = "🤖 Emaboot: Nenhum documento encontrado com essas palavras-chave."
+    
+    return render_template_string(f'''
+        <html>
+            <head>
+                <title>Emaboot Chatbot</title>
+            </head>
+            <body>
+                <h1>Emaboot Chatbot</h1>
+                <p>{response}</p>
+                <a href="/">Voltar</a>
+            </body>
+        </html>
+    ''')
 
 @app.route('/get_link', methods=['POST'])
 def get_link():
-    title = request.form.get("title", "")
+    title = request.json.get("title")
     link = get_link_by_title(title)
     
     if link:
-        return jsonify({"response": f"🤖 Emaboot: Aqui está o link para '{title}': {link}"})
+        return jsonify({"response": f"Aqui está o link para '{title}': {link}"})
     else:
-        return jsonify({"response": "🤖 Emaboot: Link não encontrado para o título selecionado."})
+        return jsonify({"response": "Link não encontrado para o título selecionado."})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
