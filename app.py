@@ -19,47 +19,45 @@ def search_in_spreadsheet(term):
     # Certifica-se de que a busca considera o termo em qualquer parte da célula
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False, regex=True)]
     if not results.empty:
-        return results['Título do documento'].tolist()
+        return results[['Título do documento', 'Link Qualyteam']].to_dict(orient='records')
     else:
         return []
 
-def get_link_by_title(title):
-    result = df[df['Título do documento'] == title]
-    if not result.empty:
-        return result['Link Qualyteam'].values[0]
-    else:
-        return None
-
 @app.route("/", methods=["GET", "POST"])
 def home():
+    chat_history = []
+
     if request.method == "POST":
         search_term = request.form["search_term"]
         results = search_in_spreadsheet(search_term)
+        
+        if results:
+            chat_history.append(f"🤖 Emaboot: Documentos encontrados:")
+            for idx, result in enumerate(results):
+                chat_history.append(f"{idx + 1}. <a href='{result['Link Qualyteam']}' target='_blank'>{result['Título do documento']}</a>")
+        else:
+            chat_history.append("🤖 Emaboot: Nenhum documento encontrado com essas palavras-chave.")
+
         return render_template_string('''
             <h1>Emaboot Chatbot</h1>
+            <div>
+                {% for message in chat_history %}
+                    <p>{{ message|safe }}</p>
+                {% endfor %}
+            </div>
             <form method="post">
                 <label>🤖 Emaboot: Qual documento procura hoje?</label><br>
-                <input type="text" name="search_term">
+                <input type="text" name="search_term" autofocus>
                 <input type="submit" value="Enviar">
             </form>
-            {% if results %}
-                <p>🤖 Emaboot: Documentos encontrados:</p>
-                <ul>
-                {% for result in results %}
-                    <li>{{ loop.index }}. {{ result }}</li>
-                {% endfor %}
-                </ul>
-                <a href="/">Voltar</a>
-            {% else %}
-                <p>🤖 Emaboot: Nenhum documento encontrado com essas palavras-chave.</p>
-                <a href="/">Voltar</a>
-            {% endif %}
-        ''', results=results)
+        ''', chat_history=chat_history)
+
     return render_template_string('''
         <h1>Emaboot Chatbot</h1>
+        <div id="chat_history"></div>
         <form method="post">
             <label>🤖 Emaboot: Qual documento procura hoje?</label><br>
-            <input type="text" name="search_term">
+            <input type="text" name="search_term" autofocus>
             <input type="submit" value="Enviar">
         </form>
     ''')
