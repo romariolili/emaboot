@@ -54,8 +54,11 @@ def home():
             chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
     
     return render_template_string('''
-        <h1><img src="/static/images/DIPLAN.png" alt="DIPLAN Logo" style="width: 200px;"></h1>
-        <h1>Emabot da Diplan</h1>
+        <div style="text-align:center;">
+            <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN Logo" style="width: 200px;">
+            <h1>Emabot da Diplan</h1>
+            <p><b>🤖 Emabot:</b> Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?</p>
+        </div>
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
             {% for message in chat_history %}
                 <p>{{ message | safe }}</p>
@@ -86,3 +89,4 @@ if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
     chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
