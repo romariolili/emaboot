@@ -13,7 +13,7 @@ import os
 app = Flask(__name__)
 
 # Carregar a planilha Excel
-file_path = '/content/teste 1.xlsx'
+file_path = 'teste 1.xlsx'
 df = pd.read_excel(file_path)
 
 def search_in_spreadsheet(term):
