@@ -43,13 +43,13 @@ def home():
         
         # Substitui o texto do usuário pelo emoji de rosto humano
         user_message = f"{face_emoji}: {user_input}"
-        chat_history = [user_message]  # Mantém apenas a interação atual no histórico
+        chat_history.append(user_message)  # Adiciona a interação atual ao histórico
         
         results = search_in_spreadsheet(user_input)
         if results:
             chat_history.append("🤖 Emabot: Documentos encontrados:")
             for result in results:
-                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
+                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
         else:
             chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
     
@@ -69,6 +69,7 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
+    global chat_history  # Certifique-se de que o histórico de chat seja acessível
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
@@ -84,3 +85,4 @@ if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
     chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sou seu assistente de busca... Como posso ajudar?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
