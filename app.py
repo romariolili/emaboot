@@ -7,19 +7,18 @@ Original file is located at
     https://colab.research.google.com/drive/15YsDsyz4O2f8ZRb0WDs_4iQUYaPpnzvj
 """
 import os
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import pandas as pd
 
 app = Flask(__name__)
 
-# Caminho do arquivo Excel
+# Caminho do arquivo no servidor (ajuste conforme necessário)
 file_path = 'teste 1.xlsx'
 
 # Carregar a planilha Excel
 df = pd.read_excel(file_path)
 
 def search_in_spreadsheet(term):
-    # Filtrar as linhas onde a coluna 'Palavras chaves' contém o termo (considerando que as palavras estão separadas por ";")
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
         return results['Título do documento'].tolist()
@@ -27,40 +26,27 @@ def search_in_spreadsheet(term):
         return []
 
 def get_link_by_title(title):
-    # Filtrar a linha onde o 'Título do documento' corresponde ao título clicado
     result = df[df['Título do documento'] == title]
     if not result.empty:
         return result['Link Qualyteam'].values[0]
     else:
         return None
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('index.html')
+    if request.method == 'POST':
+        term = request.form['term']
+        results = search_in_spreadsheet(term)
+        return render_template('index.html', term=term, results=results)
+    return render_template('index.html', term=None, results=None)
 
-@app.route('/chatbot', methods=['POST'])
-def chatbot_interaction():
-    user_input = request.form.get("input")
-
-    term = user_input
-    results = search_in_spreadsheet(term)
-
-    if results:
-        return render_template('index.html', results=results, term=term)
-    else:
-        return render_template('index.html', results=None, term=term)
-
-@app.route('/get_link', methods=['POST'])
-def get_link():
-    title = request.form.get("title")
+@app.route('/get_link/<title>')
+def get_link(title):
     link = get_link_by_title(title)
-
     if link:
-        return render_template('index.html', link=link, title=title)
+        return redirect(link)
     else:
-        return render_template('index.html', link=None, title=title)
+        return f"<h2>Link não encontrado para o título: {title}</h2>", 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-
-
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
