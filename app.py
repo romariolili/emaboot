@@ -32,8 +32,8 @@ def home():
         results = search_in_spreadsheet(term)
         if results:
             return render_template_string('''
-                <h1>Emaboot Chatbot</h1>
-                <p><b>🤖 Emaboot:</b> Documentos encontrados:</p>
+                <h1>Emabot da Diplan</h1>
+                <p><b>🤖 Emabot:</b> Documentos encontrados:</p>
                 <ul>
                 {% for result in results %}
                     <li><a href="/get_link?title={{ result['Título do documento'] }}">{{ result['Título do documento'] }}</a></li>
@@ -43,14 +43,15 @@ def home():
             ''', results=results)
         else:
             return render_template_string('''
-                <h1>Emaboot Chatbot</h1>
-                <p><b>🤖 Emaboot:</b> Nenhum documento encontrado com essas palavras-chave.</p>
+                <h1>Emabot da Diplan</h1>
+                <p><b>🤖 Emabot:</b> Nenhum documento encontrado com essas palavras-chave.</p>
                 <br><a href="/">Voltar</a>
             ''')
     return render_template_string('''
-        <h1>Emaboot Chatbot</h1>
+        <h1>Emabot da Diplan</h1>
+        <p>Olá, eu sou a Emabot da Diplan. Estou aqui para te ajudar a encontrar os documentos que você precisa. O que você gostaria de buscar hoje?</p>
         <form method="post">
-            <label for="search">🤖 Emaboot: Qual documento procura hoje?</label><br><br>
+            <label for="search">🤖 Emabot: Insira as palavras-chave:</label><br><br>
             <input type="text" id="search" name="search">
             <input type="submit" value="Enviar">
         </form>
@@ -63,15 +64,15 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
         return render_template_string('''
-            <h1>Emaboot Chatbot</h1>
-            <p><b>🤖 Emaboot:</b> Aqui está o link para '{{ title }}':</p>
+            <h1>Emabot da Diplan</h1>
+            <p><b>🤖 Emabot:</b> Aqui está o link para '{{ title }}':</p>
             <a href="{{ link }}" target="_blank">{{ link }}</a>
             <br><br><a href="/">Voltar</a>
         ''', title=title, link=link)
     else:
         return render_template_string('''
-            <h1>Emaboot Chatbot</h1>
-            <p><b>🤖 Emaboot:</b> Link não encontrado para o título selecionado.</p>
+            <h1>Emabot da Diplan</h1>
+            <p><b>🤖 Emabot:</b> Link não encontrado para o título selecionado.</p>
             <br><a href="/">Voltar</a>
         ''')
 
