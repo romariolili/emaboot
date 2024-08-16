@@ -25,7 +25,7 @@ else:
 # Emoji de rosto humano
 face_emoji = "👤"
 
-# Inicializa o histórico de chat
+# Inicializa o histórico de chat como uma variável global
 chat_history = []
 
 def search_in_spreadsheet(term):
@@ -37,7 +37,7 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history
+    global chat_history  # Acessa a variável global chat_history
     if request.method == 'POST':
         user_input = request.form['user_input']
         
@@ -69,11 +69,11 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
+    global chat_history  # Acessa a variável global chat_history
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
-        global chat_history
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         return home()
     else:
