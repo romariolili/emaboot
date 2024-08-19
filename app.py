@@ -57,9 +57,9 @@ def home():
         <div style="text-align:center;">
             <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN Logo" style="width: 200px;">
             <h1>Emabot da Diplan</h1>
-            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;" id="chat-box">
+            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 {% for message in chat_history %}
-                    <p class="chat-message">{{ message | safe }}</p>
+                    <p>{{ message | safe }}</p>
                 {% endfor %}
             </div>
             <form method="post" action="/">
@@ -68,31 +68,6 @@ def home():
                 <input type="submit" value="Enviar">
             </form>
         </div>
-        
-        <script>
-            // Função para simular a digitação das mensagens
-            function typeEffect(element, speed) {
-                var text = element.innerHTML;
-                element.innerHTML = "";
-                var i = 0;
-                var timer = setInterval(function() {
-                    if (i < text.length) {
-                        element.append(text.charAt(i));
-                        i++;
-                    } else {
-                        clearInterval(timer);
-                    }
-                }, speed);
-            }
-
-            // Aplica o efeito de digitação para cada mensagem
-            var messages = document.querySelectorAll('.chat-message');
-            messages.forEach(function(message, index) {
-                setTimeout(function() {
-                    typeEffect(message, 50);
-                }, index * 1000); // Ajusta o tempo para começar a digitar
-            });
-        </script>
     ''', chat_history=chat_history)
 
 @app.route('/get_link', methods=['GET'])
@@ -115,9 +90,9 @@ def get_link():
         <div style="text-align:center;">
             <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN Logo" style="width: 200px;">
             <h1>Emabot da Diplan</h1>
-            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;" id="chat-box">
+            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 {% for message in chat_history %}
-                    <p class="chat-message">{{ message | safe }}</p>
+                    <p>{{ message | safe }}</p>
                 {% endfor %}
             </div>
             <form method="post" action="/">
@@ -126,31 +101,6 @@ def get_link():
                 <input type="submit" value="Enviar">
             </form>
         </div>
-        
-        <script>
-            // Função para simular a digitação das mensagens
-            function typeEffect(element, speed) {
-                var text = element.innerHTML;
-                element.innerHTML = "";
-                var i = 0;
-                var timer = setInterval(function() {
-                    if (i < text.length) {
-                        element.append(text.charAt(i));
-                        i++;
-                    } else {
-                        clearInterval(timer);
-                    }
-                }, speed);
-            }
-
-            // Aplica o efeito de digitação para cada mensagem
-            var messages = document.querySelectorAll('.chat-message');
-            messages.forEach(function(message, index) {
-                setTimeout(function() {
-                    typeEffect(message, 50);
-                }, index * 1000); // Ajusta o tempo para começar a digitar
-            });
-        </script>
     ''', chat_history=chat_history)
 
 if __name__ == "__main__":
