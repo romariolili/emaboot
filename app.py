@@ -20,7 +20,7 @@ if os.path.exists(file_path):
     # Carregar a planilha Excel
     df = pd.read_excel(file_path)
 else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam"])
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
 
 # Emoji de rosto humano
 face_emoji = "👤"
@@ -29,7 +29,7 @@ def search_in_spreadsheet(term):
     term = term.lower()  # Converte a entrada do usuário para minúsculas
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam']].to_dict('records')
+        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
         return []
 
@@ -80,9 +80,11 @@ def get_link():
     
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
+        resumo = result['Resumo'].values[0]  # Obtém o resumo
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
+        chat_history.append(f"📄 Resumo: {resumo}")
     else:
-        chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
+        chat_history.append("🤖 Emabot: Link ou resumo não encontrados para o título selecionado.")
     
     return render_template_string('''
         <div style="text-align:center;">
