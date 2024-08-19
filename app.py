@@ -23,7 +23,7 @@ else:
     df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
 
 # Emoji de rosto humano
-face_emoji = "👤"
+face_emoji = "🕵🏻"
 
 def search_in_spreadsheet(term):
     term = term.lower()  # Converte a entrada do usuário para minúsculas
