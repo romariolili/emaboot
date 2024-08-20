@@ -7,11 +7,17 @@
 </head>
 <body>
     <!-- Imagem superior -->
-    <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Diplan Logo" style="width: 100%; height: auto; display: block; margin-bottom: 20px;">
+    <div style="text-align: center;">
+        <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Diplan Logo" style="width: 300px; height: auto; display: block; margin: 0 auto;">
+    </div>
+
+    <!-- Título principal -->
+    <div style="margin-top: 20px; text-align: center;">
+        <h1>Emabot da Diplan</h1>
+    </div>
 
     <!-- Conteúdo principal -->
     <div style="margin-top: 20px;">
-        <h1>Emabot da Diplan</h1>
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
             {% for message in chat_history %}
                 <p>{{ message | safe }}</p>
@@ -23,11 +29,6 @@
             <input type="submit" value="Enviar">
         </form>
     </div>
-
-    <!-- Imagem lateral -->
-    <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: auto; float: right;">
-</body>
-</html>
 
     <!-- Imagem lateral -->
     <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: auto; float: right;">
