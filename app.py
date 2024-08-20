@@ -54,19 +54,23 @@ def home():
             chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         
     return render_template_string('''
-        <div style="text-align:center;">
-            <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN Logo" style="width: 200px;">
-            <h1>Emabot da Diplan</h1>
-            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                {% for message in chat_history %}
-                    <p>{{ message | safe }}</p>
-                {% endfor %}
+        <div style="display: flex; justify-content: space-between;">
+            <div style="width: 65%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
             </div>
-            <form method="post" action="/">
-                <label for="user_input">Digite sua mensagem:</label><br>
-                <input type="text" id="user_input" name="user_input" style="width:80%">
-                <input type="submit" value="Enviar">
-            </form>
+            <div style="width: 30%;">
+                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 100%;">
+            </div>
         </div>
     ''', chat_history=chat_history)
 
@@ -87,22 +91,27 @@ def get_link():
         chat_history.append("🤖 Emabot: Link ou resumo não encontrados para o título selecionado.")
     
     return render_template_string('''
-        <div style="text-align:center;">
-            <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="DIPLAN Logo" style="width: 200px;">
-            <h1>Emabot da Diplan</h1>
-            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                {% for message in chat_history %}
-                    <p>{{ message | safe }}</p>
-                {% endfor %}
+        <div style="display: flex; justify-content: space-between;">
+            <div style="width: 65%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
             </div>
-            <form method="post" action="/">
-                <label for="user_input">Digite sua mensagem:</label><br>
-                <input type="text" id="user_input" name="user_input" style="width:80%">
-                <input type="submit" value="Enviar">
-            </form>
+            <div style="width: 30%;">
+                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 100%;">
+            </div>
         </div>
     ''', chat_history=chat_history)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
