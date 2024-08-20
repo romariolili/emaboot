@@ -106,7 +106,7 @@ def get_link():
                 </form>
             </div>
             <div style="width: 30%;">
-                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 100%;">
+                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: 300px;">
             </div>
         </div>
     ''', chat_history=chat_history)
