@@ -3,30 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emaboot Chatbot</title>
+    <title>Emabot da Diplan</title>
 </head>
 <body>
-    <h1>Emaboot Chatbot</h1>
-    <input type="text" id="userInput" placeholder="Digite algo...">
-    <button onclick="sendMessage()">Enviar</button>
-    <p id="response"></p>
+    <!-- Imagem superior -->
+    <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Diplan Logo" style="width: 100%; height: auto;">
 
-    <script>
-        async function sendMessage() {
-            const userInput = document.getElementById('userInput').value;
-            const responseElement = document.getElementById('response');
+    <!-- Conteúdo principal -->
+    <div style="margin-top: 20px;">
+        <h1>Emabot da Diplan</h1>
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            {% for message in chat_history %}
+                <p>{{ message | safe }}</p>
+            {% endfor %}
+        </div>
+        <form method="post" action="/">
+            <label for="user_input">Digite sua mensagem:</label><br>
+            <input type="text" id="user_input" name="user_input" style="width:80%">
+            <input type="submit" value="Enviar">
+        </form>
+    </div>
 
-            const response = await fetch('/chatbot', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ input: userInput })
-            });
-
-            const data = await response.json();
-            responseElement.innerText = data.response;
-        }
-    </script>
+    <!-- Imagem lateral -->
+    <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: auto; float: right;">
 </body>
 </html>
