@@ -7,7 +7,7 @@
 </head>
 <body>
     <!-- Imagem superior -->
-    <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Diplan Logo" style="width: 100%; height: auto;">
+    <img src="{{ url_for('static', filename='images/DIPLAN.png') }}" alt="Diplan Logo" style="width: 100%; height: auto; display: block; margin-bottom: 20px;">
 
     <!-- Conteúdo principal -->
     <div style="margin-top: 20px;">
@@ -23,6 +23,11 @@
             <input type="submit" value="Enviar">
         </form>
     </div>
+
+    <!-- Imagem lateral -->
+    <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: auto; float: right;">
+</body>
+</html>
 
     <!-- Imagem lateral -->
     <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: auto; float: right;">
