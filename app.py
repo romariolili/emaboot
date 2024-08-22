@@ -23,13 +23,7 @@ else:
     df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam"])
 
 # Emoji de rosto humano
-face_emoji = "👤"
-
-# Inicializa o histórico de chat como uma lista vazia
-chat_history = []
-
-# Adiciona a pergunta inicial ao histórico de chat
-chat_history.append("🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?")
+face_emoji = "😊"
 
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
@@ -40,7 +34,10 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history  # Acessa a variável global chat_history
+    # Inicializa o histórico de chat sempre que a página é acessada
+    chat_history = [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
+    ]
 
     if request.method == 'POST':
         user_input = request.form['user_input']
@@ -87,7 +84,10 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    global chat_history  # Certifique-se de que o histórico de chat seja acessível
+    chat_history = [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
+    ]  # Reinicializa a conversa
+
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
@@ -101,3 +101,4 @@ def get_link():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
