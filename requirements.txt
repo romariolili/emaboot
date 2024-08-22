@@ -1,9 +1,7 @@
-Flask
-pandas
-gunicorn
-openpyxl
-werkzeug
-spacy==3.0.6
-numpy==1.19.5  # Compatível com a versão antiga do spacy
-fuzzywuzzy[speedup]
-pt_core_news_md @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.0.0/pt_core_news_md-3.0.0.tar.gz
+Flask==2.1.3
+pandas==1.3.3
+gunicorn==20.1.0
+openpyxl==3.0.9
+werkzeug==2.1.3
+spacy==3.1.3
+fuzzywuzzy[speedup]==0.18.0
