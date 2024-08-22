@@ -69,7 +69,11 @@ def home():
                     chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
             else:
                 chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
-        
+    
+    # Verifica se é a primeira interação e inicia com a saudação se necessário
+    if not chat_history:
+        chat_history.append("🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?")
+    
     return render_template_string('''
         <h1>Emabot da Diplan</h1>
         <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
