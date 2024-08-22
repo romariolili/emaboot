@@ -28,11 +28,8 @@ face_emoji = "👤"
 # Inicializa o histórico de chat como uma lista vazia
 chat_history = []
 
-# Variáveis para armazenar nome e setor do usuário
-user_name = None
-user_sector = None
-collecting_name = True
-collecting_sector = False
+# Adiciona a pergunta inicial ao histórico de chat
+chat_history.append("🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?")
 
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
@@ -43,25 +40,22 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history, user_name, user_sector, collecting_name, collecting_sector
+    global chat_history  # Acessa a variável global chat_history
 
     if request.method == 'POST':
         user_input = request.form['user_input']
-        
-        # Substitui o texto do usuário pelo emoji de rosto humano
-        user_message = f"{face_emoji}: {user_input}"
-        chat_history.append(user_message)  # Adiciona a interação atual ao histórico
-        
-        if collecting_name:
-            user_name = user_input
-            collecting_name = False
-            collecting_sector = True
+
+        if len(chat_history) == 1:
+            # Primeira resposta do usuário
+            chat_history.append(f"{face_emoji}: {user_input}")
             chat_history.append("🤖 Emabot: Qual seu setor?")
-        elif collecting_sector:
-            user_sector = user_input
-            collecting_sector = False
-            chat_history.append(f"🤖 Emabot: Obrigado, {user_name}, do setor {user_sector}. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
+        elif len(chat_history) == 3:
+            # Segunda resposta do usuário
+            chat_history.append(f"{face_emoji}: {user_input}")
+            chat_history.append("🤖 Emabot: Obrigado pelas respostas. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
         else:
+            # Respostas subsequentes
+            chat_history.append(f"{face_emoji}: {user_input}")
             results = search_in_spreadsheet(user_input)
             if results:
                 chat_history.append("🤖 Emabot: Documentos encontrados:")
@@ -69,23 +63,26 @@ def home():
                     chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
             else:
                 chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
-    
-    # Verifica se é a primeira interação e inicia com a saudação se necessário
-    if not chat_history:
-        chat_history.append("🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?")
-    
+
     return render_template_string('''
-        <h1>Emabot da Diplan</h1>
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            {% for message in chat_history %}
-                <p>{{ message | safe }}</p>
-            {% endfor %}
+        <div style="display: flex;">
+            <div style="width: 70%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
+            </div>
+            <div style="width: 30%; text-align: center;">
+                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
+            </div>
         </div>
-        <form method="post" action="/">
-            <label for="user_input">Digite sua mensagem:</label><br>
-            <input type="text" id="user_input" name="user_input" style="width:80%">
-            <input type="submit" value="Enviar">
-        </form>
     ''', chat_history=chat_history)
 
 @app.route('/get_link', methods=['GET'])
@@ -103,6 +100,4 @@ def get_link():
     return redirect(url_for('home'))
 
 if __name__ == "__main__":
-    # Inicializa a conversa com a nova saudação
-    chat_history = ["🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
