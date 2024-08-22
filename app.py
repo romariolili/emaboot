@@ -9,10 +9,12 @@ Original file is located at
 from flask import Flask, request, render_template_string, redirect, url_for
 import pandas as pd
 import os
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+import spacy
 
 app = Flask(__name__)
+
+# Carregue o modelo de linguagem do spaCy para português
+nlp = spacy.load("pt_core_news_md")
 
 # Caminho do arquivo no servidor
 file_path = 'teste 1.xlsx'
@@ -34,14 +36,19 @@ def initialize_chat_history():
     ]
 
 def search_in_spreadsheet(term):
-    # Extrai todas as palavras-chave da planilha
-    keywords = df['Palavras chaves'].tolist()
-    # Encontra a palavra mais semelhante à entrada do usuário
-    best_match, similarity = process.extractOne(term, keywords, scorer=fuzz.token_sort_ratio)
+    term_doc = nlp(term)
+    best_match = None
+    best_similarity = 0.0
     
-    if similarity >= 70:  # Define um limite de similaridade
-        # Filtra os documentos com base na palavra-chave mais semelhante encontrada
-        results = df[df['Palavras chaves'].str.contains(best_match, case=False, na=False)]
+    for keywords in df['Palavras chaves']:
+        keywords_doc = nlp(keywords)
+        similarity = term_doc.similarity(keywords_doc)
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_match = keywords
+    
+    if best_similarity > 0.7:  # Define um limite de similaridade semântica
+        results = df[df['Palavras chaves'] == best_match]
         return best_match, results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
         return None, []
@@ -113,3 +120,4 @@ def get_link():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
