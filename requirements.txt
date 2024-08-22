@@ -3,9 +3,7 @@ pandas
 gunicorn
 openpyxl
 werkzeug
-fuzzywuzzy[speedup]
 spacy==3.0.6
-numpy==1.23.3
+numpy==1.19.5  # Compatível com a versão antiga do spacy
+fuzzywuzzy[speedup]
 pt_core_news_md @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.0.0/pt_core_news_md-3.0.0.tar.gz
-
-
