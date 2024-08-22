@@ -20,7 +20,7 @@ if os.path.exists(file_path):
     # Carregar a planilha Excel
     df = pd.read_excel(file_path)
 else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam"])
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
 
 # Emoji de rosto humano
 face_emoji = "😊"
@@ -28,6 +28,11 @@ face_emoji = "😊"
 # Variáveis globais para armazenar nome e setor
 user_name = ""
 user_sector = ""
+
+# Inicializa o histórico de chat
+chat_history = [
+    "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
+]
 
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
@@ -39,12 +44,6 @@ def search_in_spreadsheet(term):
 @app.route('/', methods=['GET', 'POST'])
 def home():
     global chat_history, user_name, user_sector  # Acessa as variáveis globais
-
-    # Inicializa o histórico de chat sempre que a página é acessada
-    if request.method == 'GET':
-        chat_history = [
-            "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
-        ]
 
     if request.method == 'POST':
         user_input = request.form['user_input']
@@ -104,29 +103,8 @@ def get_link():
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
-    # Renderiza a mesma página inicial para permitir novas interações sem reiniciar a conversa
-    return render_template_string('''
-        <div style="display: flex;">
-            <div style="width: 70%;">
-                <h1>Emabot da Diplan</h1>
-                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                    {% for message in chat_history %}
-                        <p>{{ message | safe }}</p>
-                    {% endfor %}
-                </div>
-                <form method="post" action="/">
-                    <label for="user_input">Digite sua mensagem:</label><br>
-                    <input type="text" id="user_input" name="user_input" style="width:80%">
-                    <input type="submit" value="Enviar">
-                </form>
-            </div>
-            <div style="width: 30%; text-align: center;">
-                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
-            </div>
-        </div>
-    ''', chat_history=chat_history)
+    # Redireciona de volta para a página principal para manter o fluxo de interação
+    return redirect(url_for('home'))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
