@@ -42,9 +42,9 @@ def search_in_spreadsheet(term):
     if similarity >= 70:  # Define um limite de similaridade
         # Filtra os documentos com base na palavra-chave mais semelhante encontrada
         results = df[df['Palavras chaves'].str.contains(best_match, case=False, na=False)]
-        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
+        return best_match, results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
-        return []
+        return None, []
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -63,9 +63,9 @@ def home():
                 chat_history.append(f"{face_emoji}: {user_input}")
                 
                 # Busca nos documentos
-                results = search_in_spreadsheet(user_input)
+                best_match, results = search_in_spreadsheet(user_input)
                 if results:
-                    chat_history.append("🤖 Emabot: Documentos encontrados:")
+                    chat_history.append(f"🤖 Emabot: Documentos encontrados com a palavra-chave mais próxima '{best_match}':")
                     for result in results:
                         chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
                 else:
@@ -113,5 +113,3 @@ def get_link():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-
