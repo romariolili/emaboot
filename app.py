@@ -25,10 +25,11 @@ else:
 # Emoji de rosto humano
 face_emoji = "😊"
 
-# Inicializa o histórico de chat com a saudação inicial
-chat_history = [
-    "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
-]
+def initialize_chat_history():
+    """Inicializa o histórico de chat com a saudação inicial."""
+    return [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+    ]
 
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
@@ -39,15 +40,16 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history  # Acessa a variável global chat_history
+    # Inicializa o histórico de chat para cada nova sessão
+    chat_history = initialize_chat_history()
 
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
 
         if user_input:  # Verifica se o input não está vazio
-            if len(user_input.split()) > 3:  # Verifica se o usuário digitou uma frase (mais de 3 palavras)
+            if len(user_input.split()) > 1:  # Verifica se o usuário digitou mais de uma palavra
                 chat_history.append(f"{face_emoji}: {user_input}")
-                chat_history.append("🤖 Emabot: Por favor, use apenas palavras-chave. Exemplo: Processos..")
+                chat_history.append("🤖 Emabot: Só consigo realizar a busca por palavra-chave.")
             else:
                 # Adiciona a entrada do usuário ao histórico
                 chat_history.append(f"{face_emoji}: {user_input}")
@@ -86,7 +88,8 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    global chat_history  # Certifique-se de que o histórico de chat seja acessível
+    # Inicializa o histórico de chat novamente ao acessar um link (reinicia a conversa)
+    chat_history = initialize_chat_history()
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
