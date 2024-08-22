@@ -102,4 +102,3 @@ if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
     chat_history = ["🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
