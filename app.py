@@ -25,6 +25,10 @@ else:
 # Emoji de rosto humano
 face_emoji = "😊"
 
+# Variáveis globais para armazenar nome e setor
+user_name = ""
+user_sector = ""
+
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
@@ -34,24 +38,29 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    global chat_history, user_name, user_sector  # Acessa as variáveis globais
+
     # Inicializa o histórico de chat sempre que a página é acessada
-    chat_history = [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
-    ]
+    if request.method == 'GET':
+        chat_history = [
+            "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
+        ]
 
     if request.method == 'POST':
         user_input = request.form['user_input']
 
         if len(chat_history) == 1:
-            # Primeira resposta do usuário
+            # Primeira resposta do usuário (Nome)
+            user_name = user_input
             chat_history.append(f"{face_emoji}: {user_input}")
             chat_history.append("🤖 Emabot: Qual seu setor?")
         elif len(chat_history) == 3:
-            # Segunda resposta do usuário
+            # Segunda resposta do usuário (Setor)
+            user_sector = user_input
             chat_history.append(f"{face_emoji}: {user_input}")
             chat_history.append("🤖 Emabot: Obrigado pelas respostas. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
         else:
-            # Respostas subsequentes
+            # Respostas subsequentes (Busca)
             chat_history.append(f"{face_emoji}: {user_input}")
             results = search_in_spreadsheet(user_input)
             if results:
@@ -84,10 +93,7 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    chat_history = [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
-    ]  # Reinicializa a conversa
-
+    global chat_history  # Certifique-se de que o histórico de chat seja acessível
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
@@ -102,3 +108,4 @@ def get_link():
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
+      
