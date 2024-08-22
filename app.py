@@ -9,6 +9,8 @@ Original file is located at
 from flask import Flask, request, render_template_string, redirect, url_for
 import pandas as pd
 import os
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 app = Flask(__name__)
 
@@ -32,8 +34,14 @@ def initialize_chat_history():
     ]
 
 def search_in_spreadsheet(term):
-    results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
-    if not results.empty:
+    # Extrai todas as palavras-chave da planilha
+    keywords = df['Palavras chaves'].tolist()
+    # Encontra a palavra mais semelhante à entrada do usuário
+    best_match, similarity = process.extractOne(term, keywords, scorer=fuzz.token_sort_ratio)
+    
+    if similarity >= 70:  # Define um limite de similaridade
+        # Filtra os documentos com base na palavra-chave mais semelhante encontrada
+        results = df[df['Palavras chaves'].str.contains(best_match, case=False, na=False)]
         return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
         return []
