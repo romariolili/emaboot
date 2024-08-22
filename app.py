@@ -25,13 +25,9 @@ else:
 # Emoji de rosto humano
 face_emoji = "😊"
 
-# Variáveis globais para armazenar nome e setor
-user_name = ""
-user_sector = ""
-
-# Inicializa o histórico de chat
+# Inicializa o histórico de chat com a saudação inicial
 chat_history = [
-    "🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"
+    "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
 ]
 
 def search_in_spreadsheet(term):
@@ -43,31 +39,22 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history, user_name, user_sector  # Acessa as variáveis globais
+    global chat_history  # Acessa a variável global chat_history
 
     if request.method == 'POST':
-        user_input = request.form['user_input']
+        user_input = request.form['user_input'].strip()
 
-        if len(chat_history) == 1:
-            # Primeira resposta do usuário (Nome)
-            user_name = user_input
-            chat_history.append(f"{face_emoji}: {user_input}")
-            chat_history.append("🤖 Emabot: Qual seu setor?")
-        elif len(chat_history) == 3:
-            # Segunda resposta do usuário (Setor)
-            user_sector = user_input
-            chat_history.append(f"{face_emoji}: {user_input}")
-            chat_history.append(f"🤖 Emabot: Obrigado, {user_name}, do setor {user_sector}. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
+        # Adiciona a entrada do usuário ao histórico
+        chat_history.append(f"{face_emoji}: {user_input}")
+        
+        # Busca nos documentos
+        results = search_in_spreadsheet(user_input)
+        if results:
+            chat_history.append("🤖 Emabot: Documentos encontrados:")
+            for result in results:
+                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
         else:
-            # Respostas subsequentes (Busca)
-            chat_history.append(f"{face_emoji}: {user_input}")
-            results = search_in_spreadsheet(user_input)
-            if results:
-                chat_history.append("🤖 Emabot: Documentos encontrados:")
-                for result in results:
-                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
-            else:
-                chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
+            chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
 
     return render_template_string('''
         <div style="display: flex;">
