@@ -4,3 +4,4 @@ gunicorn
 openpyxl
 werkzeug
 pip>=24.2
+fuzzywuzzy[speedup]
