@@ -28,6 +28,12 @@ face_emoji = "👤"
 # Inicializa o histórico de chat como uma lista vazia
 chat_history = []
 
+# Variáveis para armazenar nome e setor do usuário
+user_name = None
+user_sector = None
+collecting_name = True
+collecting_sector = False
+
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
@@ -37,7 +43,7 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    global chat_history  # Acessa a variável global chat_history
+    global chat_history, user_name, user_sector, collecting_name, collecting_sector
 
     if request.method == 'POST':
         user_input = request.form['user_input']
@@ -46,13 +52,23 @@ def home():
         user_message = f"{face_emoji}: {user_input}"
         chat_history.append(user_message)  # Adiciona a interação atual ao histórico
         
-        results = search_in_spreadsheet(user_input)
-        if results:
-            chat_history.append("🤖 Emabot: Documentos encontrados:")
-            for result in results:
-                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+        if collecting_name:
+            user_name = user_input
+            collecting_name = False
+            collecting_sector = True
+            chat_history.append("🤖 Emabot: Qual seu setor?")
+        elif collecting_sector:
+            user_sector = user_input
+            collecting_sector = False
+            chat_history.append(f"🤖 Emabot: Obrigado, {user_name}, do setor {user_sector}. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
         else:
-            chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
+            results = search_in_spreadsheet(user_input)
+            if results:
+                chat_history.append("🤖 Emabot: Documentos encontrados:")
+                for result in results:
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+            else:
+                chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         
     return render_template_string('''
         <h1>Emabot da Diplan</h1>
@@ -73,7 +89,7 @@ def get_link():
     global chat_history  # Certifique-se de que o histórico de chat seja acessível
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
-    if not result.empty():
+    if not result.empty:
         link = result['Link Qualyteam'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
     else:
@@ -84,5 +100,6 @@ def get_link():
 
 if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."]
+    chat_history = ["🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"]
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
