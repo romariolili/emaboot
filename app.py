@@ -7,109 +7,91 @@ Original file is located at
     https://colab.research.google.com/drive/15YsDsyz4O2f8ZRb0WDs_4iQUYaPpnzvj
 """
 from flask import Flask, request, render_template_string, redirect, url_for
-import pandas as pd
+import csv
 import os
 
 app = Flask(__name__)
 
-# Caminho do arquivo no servidor
-file_path = 'teste 1.xlsx'
+# Caminho do arquivo CSV para armazenar as respostas
+csv_file_path = 'user_data.csv'
 
-# Verifica se o arquivo existe
-if os.path.exists(file_path):
-    # Carregar a planilha Excel
-    df = pd.read_excel(file_path)
-else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
+# Verifica se o arquivo CSV existe; se não, cria-o com os cabeçalhos
+if not os.path.exists(csv_file_path):
+    with open(csv_file_path, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["Nome", "Setor"])
 
 # Emoji de rosto humano
 face_emoji = "👤"
 
-def search_in_spreadsheet(term):
-    term = term.lower()  # Converte a entrada do usuário para minúsculas
-    results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
-    if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
-    else:
-        return []
+# Inicializa o histórico de chat como uma lista vazia
+chat_history = []
+conversation_state = {"stage": 0, "name": "", "sector": ""}
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."]
+    global chat_history, conversation_state
 
     if request.method == 'POST':
-        user_input = request.form['user_input'].strip().lower()  # Converte a entrada do usuário para minúsculas e remove espaços em branco
+        user_input = request.form['user_input']
         
-        # Substitui o texto do usuário pelo emoji de rosto humano
-        user_message = f"{face_emoji}: {user_input}"
-        chat_history.append(user_message)  # Adiciona a interação atual ao histórico
-        
-        results = search_in_spreadsheet(user_input)
-        if results:
-            chat_history.append("🤖 Emabot: Documentos encontrados:")
-            for result in results:
-                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+        if conversation_state["stage"] == 0:
+            conversation_state["name"] = user_input
+            chat_history.append(f"{face_emoji}: {user_input}")
+            chat_history.append("🤖 Emabot: Qual seu setor?")
+            conversation_state["stage"] = 1
+            
+        elif conversation_state["stage"] == 1:
+            conversation_state["sector"] = user_input
+            chat_history.append(f"{face_emoji}: {user_input}")
+            chat_history.append("🤖 Emabot: Obrigado pelas respostas. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
+            conversation_state["stage"] = 2
+
+            # Salva os dados do usuário no arquivo CSV
+            with open(csv_file_path, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([conversation_state["name"], conversation_state["sector"]])
+            
         else:
-            chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
+            chat_history.append(f"{face_emoji}: {user_input}")
+            results = search_in_spreadsheet(user_input)
+            if results:
+                chat_history.append("🤖 Emabot: Documentos encontrados:")
+                for result in results:
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+            else:
+                chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         
+    else:
+        if conversation_state["stage"] == 0:
+            chat_history = ["🤖 Emabot: Olá, me chamo Emaboot da Diplan, qual seu nome?"]
+    
     return render_template_string('''
-        <div style="display: flex; justify-content: space-between;">
-            <div style="width: 65%;">
-                <h1>Emabot da Diplan</h1>
-                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                    {% for message in chat_history %}
-                        <p>{{ message | safe }}</p>
-                    {% endfor %}
-                </div>
-                <form method="post" action="/">
-                    <label for="user_input">Digite sua mensagem:</label><br>
-                    <input type="text" id="user_input" name="user_input" style="width:80%">
-                    <input type="submit" value="Enviar">
-                </form>
-            </div>
-            <div style="width: 30%;">
-                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 100%;">
-            </div>
+        <h1>Emabot da Diplan</h1>
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            {% for message in chat_history %}
+                <p>{{ message | safe }}</p>
+            {% endfor %}
         </div>
+        <form method="post" action="/">
+            <label for="user_input">Digite sua mensagem:</label><br>
+            <input type="text" id="user_input" name="user_input" style="width:80%">
+            <input type="submit" value="Enviar">
+        </form>
     ''', chat_history=chat_history)
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    # Inicializa o histórico de chat a cada nova sessão
-    chat_history = ["🤖 Emabot: Olá, eu sou a Emabot da Diplan. Sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."]
-
+    global chat_history
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
-    
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
-        resumo = result['Resumo'].values[0]  # Obtém o resumo
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
-        chat_history.append(f"📄 Resumo: {resumo}")
     else:
-        chat_history.append("🤖 Emabot: Link ou resumo não encontrados para o título selecionado.")
+        chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
-    return render_template_string('''
-        <div style="display: flex; justify-content: space-between;">
-            <div style="width: 65%;">
-                <h1>Emabot da Diplan</h1>
-                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                    {% for message in chat_history %}
-                        <p>{{ message | safe }}</p>
-                    {% endfor %}
-                </div>
-                <form method="post" action="/">
-                    <label for="user_input">Digite sua mensagem:</label><br>
-                    <input type="text" id="user_input" name="user_input" style="width:80%">
-                    <input type="submit" value="Enviar">
-                </form>
-            </div>
-            <div style="width: 30%;">
-                <img src="{{ url_for('static', filename='images/your_image_name.png') }}" alt="Diplan Assistant" style="width: 300px; height: 300px;">
-            </div>
-        </div>
-    ''', chat_history=chat_history)
-    
+    return redirect(url_for('home'))
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
