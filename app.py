@@ -11,14 +11,14 @@ import pandas as pd
 import os
 import spacy
 from fuzzywuzzy import fuzz
+from spacy.cli import download
 
 app = Flask(__name__)
 
-# Tentar carregar o modelo do spaCy, e se não estiver instalado, fazer o download
+# Baixe o modelo se não estiver disponível
 try:
     nlp = spacy.load("pt_core_news_md")
-except OSError:
-    from spacy.cli import download
+except:
     download("pt_core_news_md")
     nlp = spacy.load("pt_core_news_md")
 
