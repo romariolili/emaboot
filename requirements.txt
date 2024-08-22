@@ -3,7 +3,6 @@ pandas
 gunicorn
 openpyxl
 werkzeug
-pip>=24.2
 fuzzywuzzy[speedup]
 spacy==3.5.0
 numpy==1.23.3
