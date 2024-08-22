@@ -8,19 +8,19 @@ Original file is located at
 """
 from flask import Flask, request, render_template_string, redirect, url_for
 import pandas as pd
-import spacy
-from spacy.cli import download
 import os
+import spacy
+from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
-# Verifica se o modelo já foi baixado
-model_name = "pt_core_news_md"
+# Tentar carregar o modelo do spaCy, e se não estiver instalado, fazer o download
 try:
-    nlp = spacy.load(model_name)
+    nlp = spacy.load("pt_core_news_md")
 except OSError:
-    download(model_name)
-    nlp = spacy.load(model_name)
+    from spacy.cli import download
+    download("pt_core_news_md")
+    nlp = spacy.load("pt_core_news_md")
 
 # Caminho do arquivo no servidor
 file_path = 'teste 1.xlsx'
@@ -30,7 +30,7 @@ if os.path.exists(file_path):
     # Carregar a planilha Excel
     df = pd.read_excel(file_path)
 else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam"])
 
 # Emoji de rosto humano
 face_emoji = "😊"
@@ -39,9 +39,10 @@ face_emoji = "😊"
 chat_history = []
 
 def search_in_spreadsheet(term):
+    term = term.lower()
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
+        return results[['Título do documento', 'Link Qualyteam']].to_dict('records')
     else:
         return []
 
@@ -50,31 +51,47 @@ def home():
     global chat_history  # Acessa a variável global chat_history
 
     if request.method == 'POST':
-        user_input = request.form['user_input']
-
-        # Verifica se o usuário digitou algo
-        if not user_input.strip():
-            chat_history.append("🤖 Emabot: Por favor, digite uma palavra-chave.")
-            return render_template_string(render_chat_template(), chat_history=chat_history)
+        user_input = request.form['user_input'].strip()
         
         # Substitui o texto do usuário pelo emoji de rosto humano
-        user_message = f"{face_emoji}: {user_input}"
-        chat_history.append(user_message)  # Adiciona a interação atual ao histórico
+        if user_input:
+            user_message = f"{face_emoji}: {user_input}"
+            chat_history.append(user_message)  # Adiciona a interação atual ao histórico
 
-        # Verifica se o usuário digitou mais de uma palavra
-        if len(user_input.split()) > 1:
-            chat_history.append("🤖 Emabot: Só consigo realizar a busca por palavra-chave.")
-            return render_template_string(render_chat_template(), chat_history=chat_history)
-
-        results = search_in_spreadsheet(user_input)
-        if results:
-            chat_history.append("🤖 Emabot: Documentos encontrados:")
-            for result in results:
-                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+            # Verificar se a entrada contém mais de uma palavra
+            if len(user_input.split()) > 1:
+                chat_history.append("🤖 Emabot: Só consigo realizar a busca por palavra-chave. Tente novamente.")
+            else:
+                results = search_in_spreadsheet(user_input)
+                if results:
+                    chat_history.append("🤖 Emabot: Documentos encontrados:")
+                    for result in results:
+                        chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+                else:
+                    chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         else:
-            chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
-        
-    return render_template_string(render_chat_template(), chat_history=chat_history)
+            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave para a busca.")
+
+    return render_template_string('''
+        <div style="display: flex;">
+            <div style="width: 70%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
+            </div>
+            <div style="width: 30%; text-align: center;">
+                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    ''', chat_history=chat_history)
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
@@ -83,28 +100,12 @@ def get_link():
     result = df[df['Título do documento'] == title]
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
-        resumo = result['Resumo'].values[0] if 'Resumo' in result else "Nenhum resumo disponível."
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
-        chat_history.append(f"📄 Resumo: {resumo}")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
+    # Redireciona de volta para a página principal para manter o fluxo de interação
     return redirect(url_for('home'))
-
-def render_chat_template():
-    return '''
-        <h1>Emabot da Diplan</h1>
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            {% for message in chat_history %}
-                <p>{{ message | safe }}</p>
-            {% endfor %}
-        </div>
-        <form method="post" action="/">
-            <label for="user_input">Digite sua mensagem:</label><br>
-            <input type="text" id="user_input" name="user_input" style="width:80%">
-            <input type="submit" value="Enviar">
-        </form>
-    '''
 
 if __name__ == "__main__":
     # Inicializa a conversa com a nova saudação
