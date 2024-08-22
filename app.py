@@ -44,17 +44,20 @@ def home():
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
 
-        # Adiciona a entrada do usuário ao histórico
-        chat_history.append(f"{face_emoji}: {user_input}")
-        
-        # Busca nos documentos
-        results = search_in_spreadsheet(user_input)
-        if results:
-            chat_history.append("🤖 Emabot: Documentos encontrados:")
-            for result in results:
-                chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+        if user_input:  # Verifica se o input não está vazio
+            # Adiciona a entrada do usuário ao histórico
+            chat_history.append(f"{face_emoji}: {user_input}")
+            
+            # Busca nos documentos
+            results = search_in_spreadsheet(user_input)
+            if results:
+                chat_history.append("🤖 Emabot: Documentos encontrados:")
+                for result in results:
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+            else:
+                chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         else:
-            chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
+            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave para realizar a busca.")
 
     return render_template_string('''
         <div style="display: flex;">
