@@ -32,7 +32,7 @@ user_sector = ""
 def search_in_spreadsheet(term):
     results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam']].to_dict('records')
+        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
         return []
 
@@ -58,7 +58,7 @@ def home():
             # Segunda resposta do usuário (Setor)
             user_sector = user_input
             chat_history.append(f"{face_emoji}: {user_input}")
-            chat_history.append("🤖 Emabot: Obrigado pelas respostas. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
+            chat_history.append(f"🤖 Emabot: Obrigado, {user_name}, do setor {user_sector}. Sou sua assistente de busca... Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos..")
         else:
             # Respostas subsequentes (Busca)
             chat_history.append(f"{face_emoji}: {user_input}")
@@ -98,14 +98,33 @@ def get_link():
     result = df[df['Título do documento'] == title]
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
+        resumo = result['Resumo'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
+        chat_history.append(f"📄 Resumo: {resumo}")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
-    # Redireciona de volta para a página principal para manter o fluxo de interação
-    return redirect(url_for('home'))
+    # Renderiza a mesma página inicial para permitir novas interações sem reiniciar a conversa
+    return render_template_string('''
+        <div style="display: flex;">
+            <div style="width: 70%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
+            </div>
+            <div style="width: 30%; text-align: center;">
+                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
+            </div>
+        </div>
+    ''', chat_history=chat_history)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
-      
