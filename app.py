@@ -40,8 +40,8 @@ def search_in_spreadsheet(term):
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Inicializa o histórico de chat para cada nova sessão
-    chat_history = initialize_chat_history()
+    # Verifica se há um histórico de chat na sessão ou inicializa um novo
+    chat_history = request.args.getlist('chat_history') or initialize_chat_history()
 
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
@@ -59,7 +59,7 @@ def home():
                 if results:
                     chat_history.append("🤖 Emabot: Documentos encontrados:")
                     for result in results:
-                        chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']}</a>")
+                        chat_history.append(f"📄 <a href='{url_for('get_link', title=result['Título do documento'], chat_history=chat_history)}'>{result['Título do documento']}</a>")
                 else:
                     chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
         else:
@@ -88,8 +88,8 @@ def home():
 
 @app.route('/get_link', methods=['GET'])
 def get_link():
-    # Inicializa o histórico de chat novamente ao acessar um link (reinicia a conversa)
-    chat_history = initialize_chat_history()
+    # Recupera o histórico de chat da URL
+    chat_history = request.args.getlist('chat_history')
     title = request.args.get('title')
     result = df[df['Título do documento'] == title]
     if not result.empty:
@@ -100,8 +100,27 @@ def get_link():
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
     
-    # Redireciona de volta para a página principal para manter o fluxo de interação
-    return redirect(url_for('home'))
+    # Renderiza a página principal com o histórico de chat atualizado
+    return render_template_string('''
+        <div style="display: flex;">
+            <div style="width: 70%;">
+                <h1>Emabot da Diplan</h1>
+                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                    {% for message in chat_history %}
+                        <p>{{ message | safe }}</p>
+                    {% endfor %}
+                </div>
+                <form method="post" action="/">
+                    <label for="user_input">Digite sua mensagem:</label><br>
+                    <input type="text" id="user_input" name="user_input" style="width:80%">
+                    <input type="submit" value="Enviar">
+                </form>
+            </div>
+            <div style="width: 30%; text-align: center;">
+                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
+            </div>
+        </div>
+    ''', chat_history=chat_history)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
