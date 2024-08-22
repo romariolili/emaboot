@@ -8,3 +8,4 @@ fuzzywuzzy[speedup]
 Flask
 pandas
 spacy
+pt_core_news_md @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_md-3.0.0/pt_core_news_md-3.0.0.tar.gz
