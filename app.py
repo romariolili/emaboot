@@ -79,7 +79,7 @@ def get_link():
         resumo = result['Resumo'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📄 Resumo: {resumo}")
-       else:
+    else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
     return render_template_string(template, chat_history=chat_history)
@@ -220,4 +220,3 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
-
