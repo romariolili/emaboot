@@ -28,10 +28,9 @@ face_emoji = "😊"
 
 # Função para inicializar o histórico de chat
 def initialize_chat_history():
-    if 'chat_history' not in session:
-        session['chat_history'] = [
-            "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
-        ]
+    session['chat_history'] = [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+    ]
     return session['chat_history']
 
 # Função para adicionar mensagem ao histórico de chat
@@ -51,7 +50,11 @@ def search_in_spreadsheet(term):
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    chat_history = initialize_chat_history()
+    # Se a requisição for GET (recarregamento ou primeira visita), resetar o histórico
+    if request.method == 'GET':
+        chat_history = initialize_chat_history()
+    else:
+        chat_history = session.get('chat_history', [])
 
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
@@ -233,3 +236,4 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
+
