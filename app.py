@@ -109,10 +109,10 @@ template = '''
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            justify-content: center; /* Centraliza a caixa de chat */
+            justify-content: flex-start; /* Alinhamento à esquerda */
         }
         .chat-box {
-            width: 50%; /* Reduzido em 20% */
+            width: 50%;
             background-color: rgba(0, 0, 51, 0.8); /* Fundo da caixa de chat com transparência */
             padding: 20px;
             border-radius: 8px;
@@ -122,7 +122,7 @@ template = '''
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 400px;
+            height: 320px; /* Reduzido em 20% da altura original de 400px */
             overflow-y: auto;
             margin-bottom: 10px;
             border-radius: 4px;
