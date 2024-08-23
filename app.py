@@ -103,6 +103,10 @@ template = '''
             background-position: center;
             background-repeat: no-repeat;
             color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
             display: flex;
@@ -110,6 +114,9 @@ template = '''
             margin: 0 auto;
             padding: 20px;
             justify-content: flex-start; /* Alinhamento à esquerda */
+            flex-direction: column;
+            margin-top: auto;
+            margin-bottom: 50px; /* Coloca a caixa mais para baixo */
         }
         .chat-box {
             width: 50%;
@@ -122,7 +129,7 @@ template = '''
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 320px; /* Reduzido em 20% da altura original de 400px */
+            height: 256px; /* Reduzido em mais 15% da altura anterior de 320px */
             overflow-y: auto;
             margin-bottom: 10px;
             border-radius: 4px;
