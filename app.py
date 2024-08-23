@@ -79,12 +79,12 @@ def get_link():
         resumo = result['Resumo'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📄 Resumo: {resumo}")
-    else:
+       else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com ajustes no layout
+# Template HTML com a imagem de fundo e estilos adicionados
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -93,6 +93,68 @@ template = '''
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
     <style>
+        /* Estilos gerais */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('/static/images/Imagem de fundo.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            justify-content: center; /* Centraliza a caixa de chat */
+        }
+        .chat-box {
+            width: 50%; /* Reduzido em 20% */
+            background-color: rgba(0, 0, 51, 0.8); /* Fundo da caixa de chat com transparência */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-left: 0; /* Alinhado à esquerda */
+        }
+        .chat-history {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1); /* Fundo da caixa de histórico com transparência */
+        }
+        .chat-history p {
+            margin: 5px 0;
+        }
+        .user-input {
+            display: flex;
+            align-items: center;
+        }
+        .user-input input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .user-input input[type="submit"] {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border: none;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .user-input input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
         /* Estilos para o indicador de carregamento */
         #loading-overlay {
             position: fixed;
@@ -121,70 +183,6 @@ template = '''
             height: 60px;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
-        }
-        /* Estilos gerais */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            margin: 0;
-            padding: 20px;
-            background-image: url('/static/images/background_image.png');
-            background-size: cover;
-            background-position: center;
-            color: #fff;
-        }
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
-            flex-direction: column;
-            align-items: center;
-        }
-        .chat-box {
-            width: 60%;
-            margin-top: 20px;
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .chat-history {
-            border:1px solid #ccc;
-            padding:10px;
-            height: 300px;
-            overflow-y: auto;
-            margin-bottom:10px;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-        .chat-history p {
-            margin: 5px 0;
-        }
-        .user-input {
-            display: flex;
-            align-items: center;
-        }
-        .user-input input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border:none;
-            border-radius: 4px;
-            font-size: 1em;
-            background-color: #fff;
-            color: #333;
-        }
-        .user-input input[type="submit"] {
-            padding: 10px 20px;
-            margin-left: 10px;
-            border:none;
-            background-color: #3498db;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        .user-input input[type="submit"]:hover {
-            background-color: #2980b9;
         }
     </style>
 </head>
@@ -222,3 +220,4 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
+
