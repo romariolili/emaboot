@@ -28,9 +28,10 @@ face_emoji = "😊"
 
 # Função para inicializar o histórico de chat
 def initialize_chat_history():
-    session['chat_history'] = [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
-    ]
+    if 'chat_history' not in session:
+        session['chat_history'] = [
+            "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+        ]
     return session['chat_history']
 
 # Função para adicionar mensagem ao histórico de chat
@@ -50,11 +51,7 @@ def search_in_spreadsheet(term):
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Se a requisição for GET (recarregamento ou primeira visita), resetar o histórico
-    if request.method == 'GET':
-        chat_history = initialize_chat_history()
-    else:
-        chat_history = session.get('chat_history', [])
+    chat_history = initialize_chat_history()
 
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
@@ -141,99 +138,5 @@ template = '''
             padding: 20px;
         }
         .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .chat-box {
-            width: 70%;
-            margin-right: 20px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .chat-history {
-            border:1px solid #ccc;
-            padding:10px;
-            height: 400px;
-            overflow-y: auto;
-            margin-bottom:10px;
-            border-radius: 4px;
-            background-color: #fafafa;
-        }
-        .chat-history p {
-            margin: 5px 0;
-        }
-        .user-input {
-            display: flex;
-            align-items: center;
-        }
-        .user-input input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border:1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        .user-input input[type="submit"] {
-            padding: 10px 20px;
-            margin-left: 10px;
-            border:none;
-            background-color: #3498db;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        .user-input input[type="submit"]:hover {
-            background-color: #2980b9;
-        }
-        .image-box {
-            width: 30%;
-            text-align: center;
-        }
-        .image-box img {
-            width: 100%;
-            border-radius: 8px;
-        }
-    </style>
-</head>
-<body>
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <div>Analisando...</div>
-    </div>
-
-    <div class="container">
-        <div class="chat-box">
-            <h1>Emabot da Diplan</h1>
-            <div class="chat-history">
-                {% for message in chat_history %}
-                    <p>{{ message | safe }}</p>
-                {% endfor %}
-            </div>
-            <form method="post" action="/" onsubmit="showLoading()">
-                <div class="user-input">
-                    <input type="text" id="user_input" name="user_input" placeholder="Digite sua palavra-chave aqui...">
-                    <input type="submit" value="Enviar">
-                </div>
-            </form>
-        </div>
-        <div class="image-box">
-            <img src="/static/images/your_image_name.png" alt="Diplan Assistant">
-        </div>
-    </div>
-
-    <script>
-        function showLoading() {
-            document.getElementById('loading-overlay').style.display = 'flex';
-        }
-    </script>
-</body>
-</html>
-'''
-
-if __name__ == "__main__":
-    app.run(debug=True)
+            display: f
 
