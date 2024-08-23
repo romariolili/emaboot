@@ -51,8 +51,6 @@ def search_in_spreadsheet(term):
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Limpa o histórico ao iniciar ou recarregar a página
-    session.pop('chat_history', None)
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
@@ -92,7 +90,7 @@ def get_link():
     else:
         add_to_chat_history("🤖 Emabot: Link não encontrado para o título selecionado.")
 
-    return render_template_string(template, chat_history=session['chat_history'])
+    return redirect(url_for('home'))
 
 # Template HTML com JavaScript e CSS adicionados
 template = '''
