@@ -84,7 +84,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com a imagem de fundo e estilos adicionados
+# Template HTML com JavaScript e CSS adicionados
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -93,75 +93,6 @@ template = '''
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
     <style>
-        /* Estilos gerais */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-image: url('/static/images/Imagem de fundo.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: white;
-        }
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .chat-box {
-            width: 70%;
-            margin-right: 20px;
-            background-color: rgba(0, 0, 51, 0.8); /* Fundo da caixa de chat com transparência */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .chat-history {
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 400px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1); /* Fundo da caixa de histórico com transparência */
-        }
-        .chat-history p {
-            margin: 5px 0;
-        }
-        .user-input {
-            display: flex;
-            align-items: center;
-        }
-        .user-input input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        .user-input input[type="submit"] {
-            padding: 10px 20px;
-            margin-left: 10px;
-            border: none;
-            background-color: #3498db;
-            color: #fff;
-            border-radius: 4px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        .user-input input[type="submit"]:hover {
-            background-color: #2980b9;
-        }
-        .image-box {
-            width: 30%;
-            text-align: center;
-        }
-        .image-box img {
-            width: 100%;
-            border-radius: 8px;
-        }
         /* Estilos para o indicador de carregamento */
         #loading-overlay {
             position: fixed;
@@ -191,6 +122,66 @@ template = '''
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
+        /* Estilos gerais */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+            background-image: url("/static/images/Imagem de fundo.png");
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .chat-box {
+            width: 70%;
+            margin-right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: #fff;
+        }
+        .chat-history {
+            border:1px solid #ccc;
+            padding:10px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom:10px;
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .chat-history p {
+            margin: 5px 0;
+        }
+        .user-input {
+            display: flex;
+            align-items: center;
+        }
+        .user-input input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border:1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .user-input input[type="submit"] {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border:none;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .user-input input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -214,9 +205,6 @@ template = '''
                 </div>
             </form>
         </div>
-        <div class="image-box">
-            <img src="/static/images/your_image_name.png" alt="Diplan Assistant">
-        </div>
     </div>
 
     <script>
@@ -230,3 +218,4 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
+
