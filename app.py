@@ -33,7 +33,7 @@ def initialize_chat_history():
 
 # Função de busca na planilha
 def search_in_spreadsheet(term):
-    results = df[df['Palavras chaves'].str.contains(term, case=False, na=False)]
+    results = df[df['Palavras chaves'].str.contains(fr'\b{term}\b', case=False, na=False, regex=True)]
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
@@ -48,10 +48,10 @@ def home():
         user_input = request.form['user_input'].strip()
 
         if user_input:
-            if len(user_input.split()) > 1: 
+            if len(user_input.split()) > 1:
                 chat_history.append(f"{face_emoji}: {user_input}")
-                chat_history.append("🤖 Emabot: Só consigo realizar a busca por palavra-chave.")
-            elif len(user_input) < 3: 
+                chat_history.append("🤖 Emabot: Só consigo realizar a busca por uma única palavra-chave.")
+            elif len(user_input) < 3:
                 chat_history.append(f"{face_emoji}: {user_input}")
                 chat_history.append("🤖 Emabot: A busca deve conter pelo menos 3 caracteres.")
             else:
@@ -62,30 +62,11 @@ def home():
                     for result in results:
                         chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
                 else:
-                    chat_history.append("🤖 Emabot: Nenhum documento encontrado com essas palavras-chave.")
+                    chat_history.append("🤖 Emabot: Nenhum documento encontrado com essa palavra-chave.")
         else:
             chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave para realizar a busca.")
 
-    return render_template_string('''
-        <div style="display: flex;">
-            <div style="width: 70%;">
-                <h1>Emabot da Diplan</h1>
-                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                    {% for message in chat_history %}
-                        <p>{{ message | safe }}</p>
-                    {% endfor %}
-                </div>
-                <form method="post" action="/">
-                    <label for="user_input">Digite sua mensagem:</label><br>
-                    <input type="text" id="user_input" name="user_input" style="width:80%">
-                    <input type="submit" value="Enviar">
-                </form>
-            </div>
-            <div style="width: 30%; text-align: center;">
-                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
-            </div>
-        </div>
-    ''', chat_history=chat_history)
+    return render_template_string(template, chat_history=chat_history)
 
 # Rota para obter o link do documento
 @app.route('/get_link', methods=['GET'])
@@ -100,27 +81,147 @@ def get_link():
         chat_history.append(f"📄 Resumo: {resumo}")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
-    
-    return render_template_string('''
-        <div style="display: flex;">
-            <div style="width: 70%;">
-                <h1>Emabot da Diplan</h1>
-                <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                    {% for message in chat_history %}
-                        <p>{{ message | safe }}</p>
-                    {% endfor %}
-                </div>
-                <form method="post" action="/">
-                    <label for="user_input">Digite sua mensagem:</label><br>
-                    <input type="text" id="user_input" name="user_input" style="width:80%">
+
+    return render_template_string(template, chat_history=chat_history)
+
+# Template HTML com JavaScript e CSS adicionados
+template = '''
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emabot da Diplan</title>
+    <style>
+        /* Estilos para o indicador de carregamento */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.5em;
+            color: #333;
+        }
+        /* Animação de rotação */
+        @keyframes spin {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        /* Estilos gerais */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .chat-box {
+            width: 70%;
+            margin-right: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .chat-history {
+            border:1px solid #ccc;
+            padding:10px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom:10px;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .chat-history p {
+            margin: 5px 0;
+        }
+        .user-input {
+            display: flex;
+            align-items: center;
+        }
+        .user-input input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border:1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .user-input input[type="submit"] {
+            padding: 10px 20px;
+            margin-left: 10px;
+            border:none;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .user-input input[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+        .image-box {
+            width: 30%;
+            text-align: center;
+        }
+        .image-box img {
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>Analisando...</div>
+    </div>
+
+    <div class="container">
+        <div class="chat-box">
+            <h1>Emabot da Diplan</h1>
+            <div class="chat-history">
+                {% for message in chat_history %}
+                    <p>{{ message | safe }}</p>
+                {% endfor %}
+            </div>
+            <form method="post" action="/" onsubmit="showLoading()">
+                <div class="user-input">
+                    <input type="text" id="user_input" name="user_input" placeholder="Digite sua palavra-chave aqui...">
                     <input type="submit" value="Enviar">
-                </form>
-            </div>
-            <div style="width: 30%; text-align: center;">
-                <img src="/static/images/your_image_name.png" alt="Diplan Assistant" style="width: 100%;">
-            </div>
+                </div>
+            </form>
         </div>
-    ''', chat_history=chat_history)
+        <div class="image-box">
+            <img src="/static/images/your_image_name.png" alt="Diplan Assistant">
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
+'''
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(debug=True)
