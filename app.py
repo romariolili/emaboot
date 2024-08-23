@@ -84,7 +84,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com JavaScript e CSS adicionados
+# Template HTML com ajustes no layout
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -128,32 +128,34 @@ template = '''
             background-color: #f7f7f7;
             margin: 0;
             padding: 20px;
-            background-image: url("/static/images/Imagem de fundo.png");
+            background-image: url('/static/images/background_image.png');
             background-size: cover;
             background-position: center;
+            color: #fff;
         }
         .container {
             display: flex;
             max-width: 1200px;
             margin: 0 auto;
+            flex-direction: column;
+            align-items: center;
         }
         .chat-box {
-            width: 70%;
-            margin-right: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
+            width: 60%;
+            margin-top: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .chat-history {
             border:1px solid #ccc;
             padding:10px;
-            height: 400px;
+            height: 300px;
             overflow-y: auto;
             margin-bottom:10px;
             border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.2);
         }
         .chat-history p {
             margin: 5px 0;
@@ -165,9 +167,11 @@ template = '''
         .user-input input[type="text"] {
             width: 100%;
             padding: 10px;
-            border:1px solid #ccc;
+            border:none;
             border-radius: 4px;
             font-size: 1em;
+            background-color: #fff;
+            color: #333;
         }
         .user-input input[type="submit"] {
             padding: 10px 20px;
@@ -218,4 +222,3 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
-
