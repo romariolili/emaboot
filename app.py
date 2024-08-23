@@ -9,7 +9,6 @@ Original file is located at
 from flask import Flask, request, render_template_string, redirect, url_for, make_response
 import pandas as pd
 import os
-import json
 
 app = Flask(__name__)
 
@@ -50,6 +49,9 @@ def home():
             if len(user_input.split()) > 1:  # Verifica se o usuário digitou mais de uma palavra
                 chat_history.append(f"{face_emoji}: {user_input}")
                 chat_history.append("🤖 Emabot: Só consigo realizar a busca por palavra-chave.")
+            elif len(user_input) < 3:  # Verifica se a palavra é muito curta
+                chat_history.append(f"{face_emoji}: {user_input}")
+                chat_history.append("🤖 Emabot: A busca deve conter pelo menos 3 caracteres.")
             else:
                 # Adiciona a entrada do usuário ao histórico
                 chat_history.append(f"{face_emoji}: {user_input}")
