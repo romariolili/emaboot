@@ -236,10 +236,10 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 60%; /* Ajusta a largura para 50% da tela em dispositivos móveis */
-                max-width: 350px; /* Limita a largura máxima da caixa em dispositivos móveis */
+                width: 65%; /* Ajusta a largura para 50% da tela em dispositivos móveis */
+                max-width: 380px; /* Limita a largura máxima da caixa em dispositivos móveis */
                 margin-top: 5%;
-                max-height: 90vh;
+                max-height: 110vh;
             }
 
             .chat-history p {
