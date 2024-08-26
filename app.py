@@ -125,6 +125,7 @@ template = '''
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start; /* Alinha à esquerda dentro do container */
+            margin-top: 20%; /* Move a caixa 20% para baixo */
         }
         .chat-history {
             border: 1px solid #ccc;
