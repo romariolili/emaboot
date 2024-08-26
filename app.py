@@ -45,7 +45,7 @@ def home():
     # Inicializa o histórico de chat sempre que a página for carregada/recarregada
     chat_history = initialize_chat_history()
 
-    if request.method == 'POST']:
+    if request.method == 'POST':
         user_input = request.form['user_input'].strip()
 
         if user_input:
