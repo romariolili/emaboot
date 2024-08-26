@@ -28,7 +28,7 @@ face_emoji = "😊"
 # Função para inicializar o histórico de chat
 def initialize_chat_history():
     return [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+        "🤖 Emabot: Olá, me chamo Emabot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
     ]
 
 # Função de busca na planilha
