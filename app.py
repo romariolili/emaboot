@@ -236,7 +236,8 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 100%; /* Ocupa toda a largura disponível na tela mobile */
+                width: 50%; /* Ajusta a largura para 50% da tela em dispositivos móveis */
+                max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
                 margin-top: 5%;
                 max-height: 80vh;
             }
@@ -300,3 +301,4 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
+
