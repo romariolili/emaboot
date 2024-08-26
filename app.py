@@ -112,35 +112,35 @@ template = '''
         .container {
             display: flex;
             max-width: 1200px;
-            width: 100%; /* Garante que o container ocupe toda a largura em dispositivos móveis */
+            width: 100%;
             margin: 0 auto;
             padding: 20px;
-            justify-content: flex-start; /* Alinha à esquerda */
+            justify-content: flex-start;
             flex-direction: column;
             height: 100%; /* Garante que o container ocupe toda a altura da página */
         }
         .chat-box {
-            width: 100%; /* Ajusta para ocupar a largura completa em dispositivos móveis */
+            width: 100%;
             max-width: 600px; /* Limita a largura em telas maiores */
-            background-color: rgba(0, 0, 51, 0.8); /* Fundo da caixa de chat com transparência */
+            background-color: rgba(0, 0, 51, 0.8);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            align-self: flex-start; /* Alinha à esquerda dentro do container */
-            margin-top: 10%; /* Ajuste conforme necessário */
+            align-self: flex-start;
+            margin-top: 10%;
         }
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 256px; /* Reduzido em mais 15% da altura anterior de 320px */
+            height: 256px;
             overflow-y: auto;
             margin-bottom: 10px;
             border-radius: 4px;
-            background-color: rgba(255, 255, 255, 0.1); /* Fundo da caixa de histórico com transparência */
+            background-color: rgba(255, 255, 255, 0.1);
         }
         .chat-history p {
             margin: 5px 0;
-            color: white; /* Garante que o texto fique sempre branco */
+            color: white;
         }
         .user-input {
             display: flex;
@@ -169,11 +169,11 @@ template = '''
         }
         /* Estilos para links */
         a {
-            color: white; /* Links em branco */
+            color: white;
             text-decoration: underline;
         }
         a:hover {
-            color: #ccc; /* Cor dos links ao passar o mouse */
+            color: #ccc;
         }
         /* Estilos para o indicador de carregamento */
         #loading-overlay {
@@ -206,6 +206,7 @@ template = '''
         }
         @media screen and (max-width: 768px) {
             .chat-box {
+                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
             }
         }
