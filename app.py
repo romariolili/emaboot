@@ -120,7 +120,7 @@ template = '''
             display: flex;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
+            box-sizing: border-box;
         }
         /* Container principal */
         .container {
@@ -132,17 +132,16 @@ template = '''
             justify-content: flex-start;
             flex-direction: column;
             height: 100%;
-            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
+            box-sizing: border-box;
         }
-        /* Caixa de Chat */
+        /* Caixa de Chat - Versão Desktop */
         .chat-box {
             width: 100%;
-            max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
-            min-width: 50%; /* Define a largura mínima para a caixa */
+            max-width: 600px; /* Volta a configuração anterior para desktop */
             background-color: rgba(0, 0, 51, 0.8);
             padding: 20px;
             border-radius: 8px;
-            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
+            box-sizing: border-box;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start;
             margin-top: 10%;
@@ -237,23 +236,32 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
-                margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
-                max-height: 50vh;
+                width: 100%; /* Ocupa toda a largura disponível na tela mobile */
+                margin-top: 5%;
+                max-height: 80vh;
+            }
+
+            .chat-history p {
+                font-size: 0.9em; /* Reduz o tamanho da fonte na versão mobile */
             }
 
             .user-input {
                 flex-direction: column;
             }
 
+            .user-input input[type="text"] {
+                font-size: 0.9em; /* Reduz o tamanho da fonte na versão mobile */
+            }
+
             .user-input input[type="submit"] {
                 margin-left: 0;
                 margin-top: 10px;
                 width: 100%;
+                font-size: 0.9em; /* Reduz o tamanho da fonte na versão mobile */
             }
 
             .chat-history {
-                max-height: 150px;
+                max-height: 250px;
             }
         }
     </style>
