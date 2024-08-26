@@ -60,7 +60,7 @@ def home():
                 results = search_in_spreadsheet(user_input)
                 if results:
                     chat_history.append("🤖 Emabot: Documentos encontrados:")
-                    for result in results,:
+                    for result in results:
                         chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
                 else:
                     chat_history.append("🤖 Emabot: Nenhum documento encontrado com essa palavra-chave.")
