@@ -106,7 +106,7 @@ template = '''
             height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end; /* Alinha o conteúdo na parte inferior da página */
         }
         .container {
             display: flex;
@@ -115,8 +115,7 @@ template = '''
             padding: 20px;
             justify-content: flex-start; /* Alinhamento à esquerda */
             flex-direction: column;
-            margin-top: auto;
-            margin-bottom: 50px; /* Coloca a caixa mais para baixo */
+            margin-top: 150px; /* Aumenta a margem superior para mover a caixa para baixo */
         }
         .chat-box {
             width: 50%;
@@ -137,6 +136,7 @@ template = '''
         }
         .chat-history p {
             margin: 5px 0;
+            color: white; /* Garante que o texto fique sempre branco */
         }
         .user-input {
             display: flex;
@@ -148,6 +148,7 @@ template = '''
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
+            color: black;
         }
         .user-input input[type="submit"] {
             padding: 10px 20px;
@@ -161,6 +162,14 @@ template = '''
         }
         .user-input input[type="submit"]:hover {
             background-color: #2980b9;
+        }
+        /* Estilos para links */
+        a {
+            color: white; /* Links em branco */
+            text-decoration: underline;
+        }
+        a:hover {
+            color: #ccc; /* Cor dos links ao passar o mouse */
         }
         /* Estilos para o indicador de carregamento */
         #loading-overlay {
@@ -227,3 +236,4 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
+
