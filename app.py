@@ -42,6 +42,7 @@ def search_in_spreadsheet(term):
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    # Inicializa o histórico de chat sempre que a página for carregada/recarregada
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
@@ -236,4 +237,3 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
-
