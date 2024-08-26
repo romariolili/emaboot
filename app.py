@@ -45,7 +45,7 @@ def home():
     # Inicializa o histórico de chat sempre que a página for carregada/recarregada
     chat_history = initialize_chat_history()
 
-    if request.method == 'POST':
+    if request.method == 'POST']:
         user_input = request.form['user_input'].strip()
 
         if user_input:
@@ -100,15 +100,16 @@ template = '''
             margin: 0;
             padding: 0;
             background-image: url('/static/images/Imagem de fundo.png');
-            background-size: cover;
+            background-size: cover; /* Faz com que a imagem cubra toda a tela */
             background-position: center;
             background-repeat: no-repeat;
             color: white;
             height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center; /* Centraliza verticalmente */
+            align-items: center;
         }
+        /* Container principal */
         .container {
             display: flex;
             max-width: 1200px;
@@ -119,6 +120,7 @@ template = '''
             flex-direction: column;
             height: 100%; /* Garante que o container ocupe toda a altura da página */
         }
+        /* Caixa de Chat */
         .chat-box {
             width: 100%;
             max-width: 600px; /* Limita a largura em telas maiores */
@@ -128,20 +130,26 @@ template = '''
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start;
             margin-top: 10%;
+            height: auto; /* Ajusta automaticamente a altura conforme o conteúdo */
+            max-height: 70vh; /* Limita a altura da caixa a 70% da altura da viewport */
         }
+        /* Estilos para histórico de chat */
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 256px;
+            height: auto;
+            max-height: 200px; /* Limita a altura em 200px, ajustável conforme necessário */
             overflow-y: auto;
             margin-bottom: 10px;
             border-radius: 4px;
             background-color: rgba(255, 255, 255, 0.1);
         }
+        /* Texto do histórico */
         .chat-history p {
             margin: 5px 0;
             color: white;
         }
+        /* Campo de entrada e botão de envio */
         .user-input {
             display: flex;
             align-items: center;
@@ -204,11 +212,16 @@ template = '''
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
         }
+        /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 50%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
-                max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
+                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
+                max-height: 50vh; /* Limita a altura da caixa a 50% da altura da viewport */
+            }
+
+            .chat-history {
+                max-height: 150px; /* Limita a altura do histórico em dispositivos móveis */
             }
         }
     </style>
