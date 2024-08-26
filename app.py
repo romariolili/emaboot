@@ -107,16 +107,16 @@ template = '''
             height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-end; /* Alinha o conteúdo na parte inferior da página */
+            align-items: center; /* Centraliza verticalmente */
         }
         .container {
             display: flex;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            justify-content: flex-start; /* Alinhamento à esquerda */
+            justify-content: flex-start; /* Alinha à esquerda */
             flex-direction: column;
-            margin-top: 60px; /* Reduz a margem superior para subir a caixa */
+            height: 100%; /* Garante que o container ocupe toda a altura da página */
         }
         .chat-box {
             width: 50%;
@@ -124,7 +124,7 @@ template = '''
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-left: 0; /* Alinhado à esquerda */
+            align-self: flex-start; /* Alinha à esquerda dentro do container */
         }
         .chat-history {
             border: 1px solid #ccc;
