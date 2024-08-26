@@ -112,7 +112,7 @@ template = '''
             margin: 0;
             padding: 0;
             background-image: url('/static/images/Imagem de fundo.png');
-            background-size: cover; /* Faz com que a imagem cubra toda a tela */
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: white;
@@ -120,6 +120,7 @@ template = '''
             display: flex;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
         }
         /* Container principal */
         .container {
@@ -130,54 +131,57 @@ template = '''
             padding: 20px;
             justify-content: flex-start;
             flex-direction: column;
-            height: 100%; /* Garante que o container ocupe toda a altura da página */
+            height: 100%;
+            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
         }
         /* Caixa de Chat */
         .chat-box {
             width: 100%;
-            max-width: 600px; /* Limita a largura em telas maiores */
+            max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
+            min-width: 50%; /* Define a largura mínima para a caixa */
             background-color: rgba(0, 0, 51, 0.8);
             padding: 20px;
             border-radius: 8px;
-            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
+            box-sizing: border-box; /* Certifica que tudo seja incluído na largura e altura */
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start;
             margin-top: 10%;
-            height: auto; /* Ajusta automaticamente a altura conforme o conteúdo */
-            max-height: 70vh; /* Limita a altura da caixa a 70% da altura da viewport */
+            height: auto;
+            max-height: 70vh;
         }
         /* Estilos para histórico de chat */
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
             height: auto;
-            max-height: 200px; /* Limita a altura em 200px, ajustável conforme necessário */
+            max-height: 200px;
             overflow-y: auto;
             margin-bottom: 10px;
             border-radius: 4px;
             background-color: rgba(255, 255, 255, 0.1);
-            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
+            box-sizing: border-box;
         }
         /* Texto do histórico */
         .chat-history p {
             margin: 5px 0;
             color: white;
-            word-wrap: break-word; /* Garante que o texto seja quebrado corretamente e não ultrapasse os limites */
+            word-wrap: break-word; /* Garante que o texto seja quebrado corretamente */
         }
         /* Campo de entrada e botão de envio */
         .user-input {
             display: flex;
             align-items: center;
-            width: 100%; /* Garante que o campo de entrada e o botão ocupem toda a largura da caixa */
+            width: 100%;
+            box-sizing: border-box;
         }
         .user-input input[type="text"] {
-            flex-grow: 1; /* Faz o campo de texto crescer para ocupar o espaço disponível */
+            flex-grow: 1;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1em;
             color: black;
-            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
+            box-sizing: border-box;
         }
         .user-input input[type="submit"] {
             padding: 10px 20px;
@@ -188,7 +192,7 @@ template = '''
             border-radius: 4px;
             font-size: 1em;
             cursor: pointer;
-            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
+            box-sizing: border-box;
         }
         .user-input input[type="submit"]:hover {
             background-color: #2980b9;
@@ -233,24 +237,23 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 50%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
-                max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
+                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
-                max-height: 50vh; /* Limita a altura da caixa a 50% da altura da viewport */
+                max-height: 50vh;
             }
 
             .user-input {
-                flex-direction: column; /* Organiza o campo de entrada e botão em coluna para evitar que fiquem apertados */
+                flex-direction: column;
             }
 
             .user-input input[type="submit"] {
-                margin-left: 0; /* Remove a margem à esquerda quando em coluna */
-                margin-top: 10px; /* Adiciona uma margem superior para espaçar o botão do campo de texto */
-                width: 100%; /* Faz o botão ocupar toda a largura da caixa */
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
             }
 
             .chat-history {
-                max-height: 150px; /* Limita a altura do histórico em dispositivos móveis */
+                max-height: 150px;
             }
         }
     </style>
