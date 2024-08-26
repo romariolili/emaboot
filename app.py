@@ -206,7 +206,7 @@ template = '''
         }
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
+                width: 50%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
             }
         }
