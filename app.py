@@ -60,7 +60,7 @@ def home():
                 results = search_in_spreadsheet(user_input)
                 if results:
                     chat_history.append("🤖 Emabot: Documentos encontrados:")
-                    for result in results:
+                    for result in results,:
                         chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
                 else:
                     chat_history.append("🤖 Emabot: Nenhum documento encontrado com essa palavra-chave.")
@@ -153,9 +153,10 @@ template = '''
         .user-input {
             display: flex;
             align-items: center;
+            width: 100%; /* Garante que o campo de entrada e o botão ocupem toda a largura da caixa */
         }
         .user-input input[type="text"] {
-            width: 100%;
+            flex-grow: 1; /* Faz o campo de texto crescer para ocupar o espaço disponível */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -219,6 +220,16 @@ template = '''
                 max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
                 max-height: 50vh; /* Limita a altura da caixa a 50% da altura da viewport */
+            }
+
+            .user-input {
+                flex-direction: column; /* Organiza o campo de entrada e botão em coluna para evitar que fiquem apertados */
+            }
+
+            .user-input input[type="submit"] {
+                margin-left: 0; /* Remove a margem à esquerda quando em coluna */
+                margin-top: 10px; /* Adiciona uma margem superior para espaçar o botão do campo de texto */
+                width: 100%; /* Faz o botão ocupar toda a largura da caixa */
             }
 
             .chat-history {
