@@ -9,6 +9,7 @@ Original file is located at
 from flask import Flask, request, render_template_string, redirect, url_for
 import pandas as pd
 import os
+from unidecode import unidecode
 
 app = Flask(__name__)
 
@@ -25,19 +26,30 @@ else:
 # Emoji de rosto humano
 face_emoji = "😊"
 
-# Função para inicializar o histórico de chat
-def initialize_chat_history():
-    return [
-        "🤖 Emabot: Olá, me chamo Emabot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
-    ]
+# Função para normalizar o texto, removendo acentuação e convertendo para minúsculas
+def normalize(text):
+    return unidecode(text.strip().lower())
 
 # Função de busca na planilha
 def search_in_spreadsheet(term):
-    results = df[df['Palavras chaves'].str.contains(fr'\b{term}\b', case=False, na=False, regex=True)]
+    normalized_term = normalize(term)
+    
+    # Adiciona um 's' ao termo normalizado para considerar possíveis formas plurais
+    possible_terms = [normalized_term, normalized_term + 's', normalized_term.rstrip('s')]
+
+    results = df[df['Palavras chaves'].apply(lambda x: any(
+        normalize(word) in possible_terms for word in x.split(';')))]
+    
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
         return []
+
+# Função para inicializar o histórico de chat
+def initialize_chat_history():
+    return [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+    ]
 
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
@@ -216,8 +228,7 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 50%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
-                max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
+                width: 90%; /* Ajusta a largura para 90% da tela em dispositivos móveis */
                 margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
                 max-height: 50vh; /* Limita a altura da caixa a 50% da altura da viewport */
             }
