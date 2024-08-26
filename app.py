@@ -139,6 +139,7 @@ template = '''
             background-color: rgba(0, 0, 51, 0.8);
             padding: 20px;
             border-radius: 8px;
+            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start;
             margin-top: 10%;
@@ -155,11 +156,13 @@ template = '''
             margin-bottom: 10px;
             border-radius: 4px;
             background-color: rgba(255, 255, 255, 0.1);
+            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
         }
         /* Texto do histórico */
         .chat-history p {
             margin: 5px 0;
             color: white;
+            word-wrap: break-word; /* Garante que o texto seja quebrado corretamente e não ultrapasse os limites */
         }
         /* Campo de entrada e botão de envio */
         .user-input {
@@ -174,6 +177,7 @@ template = '''
             border-radius: 4px;
             font-size: 1em;
             color: black;
+            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
         }
         .user-input input[type="submit"] {
             padding: 10px 20px;
@@ -184,6 +188,7 @@ template = '''
             border-radius: 4px;
             font-size: 1em;
             cursor: pointer;
+            box-sizing: border-box; /* Inclui padding e bordas na largura e altura */
         }
         .user-input input[type="submit"]:hover {
             background-color: #2980b9;
