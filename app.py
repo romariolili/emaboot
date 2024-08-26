@@ -116,7 +116,7 @@ template = '''
             padding: 20px;
             justify-content: flex-start; /* Alinhamento à esquerda */
             flex-direction: column;
-            margin-top: 180px; /* Reduz a margem superior para subir a caixa */
+            margin-top: 60px; /* Reduz a margem superior para subir a caixa */
         }
         .chat-box {
             width: 50%;
