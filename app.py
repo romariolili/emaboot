@@ -28,7 +28,7 @@ face_emoji = "😊"
 # Função para inicializar o histórico de chat
 def initialize_chat_history():
     return [
-        "🤖 Emabot: Olá, me chamo Emabot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
     ]
 
 # Função de busca na planilha
@@ -112,6 +112,7 @@ template = '''
         .container {
             display: flex;
             max-width: 1200px;
+            width: 100%; /* Garante que o container ocupe toda a largura em dispositivos móveis */
             margin: 0 auto;
             padding: 20px;
             justify-content: flex-start; /* Alinha à esquerda */
@@ -119,13 +120,14 @@ template = '''
             height: 100%; /* Garante que o container ocupe toda a altura da página */
         }
         .chat-box {
-            width: 50%;
+            width: 100%; /* Ajusta para ocupar a largura completa em dispositivos móveis */
+            max-width: 600px; /* Limita a largura em telas maiores */
             background-color: rgba(0, 0, 51, 0.8); /* Fundo da caixa de chat com transparência */
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             align-self: flex-start; /* Alinha à esquerda dentro do container */
-            margin-top: 10%; /* Move a caixa 10% para baixo */
+            margin-top: 10%; /* Ajuste conforme necessário */
         }
         .chat-history {
             border: 1px solid #ccc;
@@ -201,6 +203,11 @@ template = '''
             height: 60px;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
+        }
+        @media screen and (max-width: 768px) {
+            .chat-box {
+                margin-top: 5%; /* Ajuste para manter a caixa dentro da imagem de fundo em telas menores */
+            }
         }
     </style>
 </head>
