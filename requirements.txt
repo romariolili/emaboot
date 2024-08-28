@@ -4,3 +4,6 @@ gunicorn
 openpyxl
 werkzeug
 unidecode
+fuzzywuzzy
+python-Levenshtein
+
