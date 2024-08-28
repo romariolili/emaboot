@@ -33,13 +33,13 @@ def normalize(text):
 # Função de busca na planilha
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
-    
-    # Adiciona um 's' ao termo normalizado para considerar possíveis formas plurais
     possible_terms = [normalized_term, normalized_term + 's', normalized_term.rstrip('s')]
 
-    results = df[df['Palavras chaves'].apply(lambda x: any(
-        normalize(word) in possible_terms for word in x.split(';')))]
-    
+    # Busca tanto na coluna "Palavras chaves" quanto na coluna "Resumo"
+    results = df[df.apply(lambda row: any(
+        normalize(word) in possible_terms for word in str(row['Palavras chaves']).split(';')
+    ) or normalized_term in normalize(row['Resumo']), axis=1)]
+
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
     else:
@@ -48,7 +48,7 @@ def search_in_spreadsheet(term):
 # Função para inicializar o histórico de chat
 def initialize_chat_history():
     return [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Fale comigo somente por palavras-chave. Exemplo: Processos.."
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
     ]
 
 # Rota principal
@@ -61,23 +61,16 @@ def home():
         user_input = request.form['user_input'].strip()
 
         if user_input:
-            if len(user_input.split()) > 1:
-                chat_history.append(f"{face_emoji}: {user_input}")
-                chat_history.append("🤖 Emabot: Só consigo realizar a busca por uma única palavra-chave.")
-            elif len(user_input) < 3:
-                chat_history.append(f"{face_emoji}: {user_input}")
-                chat_history.append("🤖 Emabot: A busca deve conter pelo menos 3 caracteres.")
+            chat_history.append(f"{face_emoji}: {user_input}")
+            results = search_in_spreadsheet(user_input)
+            if results:
+                chat_history.append("🤖 Emabot: Documentos encontrados:")
+                for result in results:
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
             else:
-                chat_history.append(f"{face_emoji}: {user_input}")
-                results = search_in_spreadsheet(user_input)
-                if results:
-                    chat_history.append("🤖 Emabot: Documentos encontrados:")
-                    for result in results:
-                        chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
-                else:
-                    chat_history.append("🤖 Emabot: Nenhum documento encontrado com essa palavra-chave.")
+                chat_history.append("🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.")
         else:
-            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave para realizar a busca.")
+            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.")
 
     return render_template_string(template, chat_history=chat_history)
 
@@ -298,7 +291,7 @@ template = '''
             </div>
             <form method="post" action="/" onsubmit="showLoading()">
                 <div class="user-input">
-                    <input type="text" id="user_input" name="user_input" placeholder="Digite sua palavra-chave aqui...">
+                    <input type="text" id="user_input" name="user_input" placeholder="Digite sua palavra-chave ou frase aqui...">
                     <input type="submit" value="Enviar">
                 </div>
             </form>
