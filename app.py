@@ -91,7 +91,7 @@ def get_link():
         link = result['Link Qualyteam'].values[0]
         resumo = result['Resumo'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
-        chat_history.append(f"📄 Resumo: {resumo}")
+        chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(\"{resumo}\")'>🔊 Ouvir</button>")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
@@ -236,10 +236,10 @@ template = '''
         /* Ajustes para versão mobile */
         @media screen and (max-width: 768px) {
             .chat-box {
-                width: 65%; /* Ajusta a largura para 50% da tela em dispositivos móveis */
-                max-width: 380px; /* Limita a largura máxima da caixa em dispositivos móveis */
+                width: 50%; /* Ajusta a largura para 50% da tela em dispositivos móveis */
+                max-width: 300px; /* Limita a largura máxima da caixa em dispositivos móveis */
                 margin-top: 5%;
-                max-height: 110vh;
+                max-height: 80vh;
             }
 
             .chat-history p {
@@ -294,6 +294,11 @@ template = '''
         function showLoading() {
             document.getElementById('loading-overlay').style.display = 'flex';
         }
+
+        function speakText(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            speechSynthesis.speak(utterance);
+        }
     </script>
 </body>
 </html>
@@ -301,4 +306,3 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
-
