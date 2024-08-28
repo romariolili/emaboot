@@ -10,6 +10,7 @@ from flask import Flask, request, render_template_string, redirect, url_for
 import pandas as pd
 import os
 from unidecode import unidecode
+from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
@@ -30,15 +31,24 @@ face_emoji = "😊"
 def normalize(text):
     return unidecode(text.strip().lower())
 
-# Função de busca na planilha
+# Função de busca na planilha usando similaridade de texto
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
-    possible_terms = [normalized_term, normalized_term + 's', normalized_term.rstrip('s')]
 
-    # Busca tanto na coluna "Palavras chaves" quanto na coluna "Resumo"
-    results = df[df.apply(lambda row: any(
-        normalize(word) in possible_terms for word in str(row['Palavras chaves']).split(';')
-    ) or normalized_term in normalize(row['Resumo']), axis=1)]
+    # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
+    score_threshold = 70
+
+    # Função para calcular similaridade
+    def is_relevant(row):
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo'
+        keywords_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        summary_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
+        
+        # Retorna True se qualquer similaridade estiver acima do limiar
+        return keywords_similarity >= score_threshold or summary_similarity >= score_threshold
+
+    # Filtra o DataFrame usando a função de relevância
+    results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
