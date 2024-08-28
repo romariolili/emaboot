@@ -91,7 +91,7 @@ def get_link():
         link = result['Link Qualyteam'].values[0]
         resumo = result['Resumo'].values[0]
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
-        chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(\"{resumo}\")'>🔊 Ouvir</button>")
+        chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
@@ -296,8 +296,13 @@ template = '''
         }
 
         function speakText(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            speechSynthesis.speak(utterance);
+            if ('speechSynthesis' in window) {  // Verifica se o navegador suporta a API
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';  // Define o idioma para Português
+                speechSynthesis.speak(utterance);
+            } else {
+                alert("Seu navegador não suporta a API de síntese de fala.");
+            }
         }
     </script>
 </body>
