@@ -97,7 +97,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com a imagem de fundo e estilos adicionados
+# Template HTML com a imagem de fundo, VLibras e Text-to-Speech adicionados
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -105,6 +105,13 @@ template = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
+
+    <!-- Script do VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
     <style>
         /* Estilos gerais */
         body {
@@ -268,6 +275,14 @@ template = '''
     </style>
 </head>
 <body>
+    <!-- Inclui o Plugin do VLibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+
     <div id="loading-overlay">
         <div class="spinner"></div>
         <div>Analisando...</div>
