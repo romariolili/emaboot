@@ -34,18 +34,18 @@ face_emoji = "😊"
 def normalize(text):
     return unidecode(text.strip().lower()) if text else ""
 
-# Função de busca na planilha usando similaridade de texto
+# Função de busca na planilha usando similaridade de texto aprimorada
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
     # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    score_threshold = 70
+    score_threshold = 85  # Aumenta o limiar para evitar resultados irrelevantes
 
-    # Função para calcular similaridade
+    # Função para calcular similaridade usando a métrica `token_sort_ratio`
     def is_relevant(row):
-        # Calcula a similaridade com 'Palavras chaves' e 'Resumo'
-        keywords_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-        summary_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando token_sort_ratio
+        keywords_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        summary_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
         
         # Retorna True se qualquer similaridade estiver acima do limiar
         return keywords_similarity >= score_threshold or summary_similarity >= score_threshold
