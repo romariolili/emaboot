@@ -22,10 +22,10 @@ file_path = 'teste 1.xlsx'
 
 # Verifica se o arquivo existe
 if os.path.exists(file_path):
-    # Carregar a planilha Excel, incluindo a coluna "Data Elaboração"
+    # Carregar a planilha Excel, incluindo a coluna "Data elaboração"
     df = pd.read_excel(file_path)
 else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo", "Data Elaboração"])
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo", "Data elaboração"])
 
 # Emoji de rosto humano
 face_emoji = "😊"
@@ -54,7 +54,7 @@ def search_in_spreadsheet(term):
     results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam', 'Resumo', 'Data Elaboração']].to_dict('records')
+        return results[['Título do documento', 'Link Qualyteam', 'Resumo', 'Data elaboração']].to_dict('records')
     else:
         return []
 
@@ -106,7 +106,7 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
-        data_atualizacao = result['Data Elaboração'].values[0] if pd.notna(result['Data Elaboração'].values[0]) else "Data não disponível"
+        data_atualizacao = result['Data elaboração'].values[0] if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
