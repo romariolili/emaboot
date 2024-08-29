@@ -32,7 +32,7 @@ face_emoji = "😊"
 
 # Função para normalizar o texto, removendo acentuação e convertendo para minúsculas
 def normalize(text):
-    return unidecode(text.strip().lower())
+    return unidecode(text.strip().lower()) if text else ""
 
 # Função de busca na planilha usando similaridade de texto
 def search_in_spreadsheet(term):
@@ -104,9 +104,9 @@ def get_link():
     result = df[df['Título do documento'] == title]
     chat_history = initialize_chat_history()
     if not result.empty:
-        link = result['Link Qualyteam'].values[0]
-        resumo = result['Resumo'].values[0]
-        data_atualizacao = result['Data Elaboração'].values[0]  # Obtém a Data de Elaboração e usa como Data de Atualização
+        link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
+        resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
+        data_atualizacao = result['Data Elaboração'].values[0] if pd.notna(result['Data Elaboração'].values[0]) else "Data não disponível"
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
@@ -344,5 +344,6 @@ template = '''
 </body>
 </html>
 '''
+
 if __name__ == "__main__":
     app.run(debug=True)
