@@ -34,21 +34,27 @@ face_emoji = "😊"
 def normalize(text):
     return unidecode(text.strip().lower()) if text else ""
 
-# Função de busca na planilha usando similaridade de texto aprimorada
+# Função de busca na planilha usando uma combinação de similaridade de texto
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
     # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    score_threshold = 85  # Aumenta o limiar para evitar resultados irrelevantes
+    strict_threshold = 75  # Limiar para correspondência estrita
+    relaxed_threshold = 60  # Limiar para correspondência mais relaxada
 
-    # Função para calcular similaridade usando a métrica `token_sort_ratio`
+    # Função para calcular similaridade usando `token_sort_ratio` para precisão e `partial_ratio` para recall
     def is_relevant(row):
         # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando token_sort_ratio
-        keywords_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-        summary_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
+        keywords_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        summary_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
         
-        # Retorna True se qualquer similaridade estiver acima do limiar
-        return keywords_similarity >= score_threshold or summary_similarity >= score_threshold
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando partial_ratio
+        keywords_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        summary_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
+        
+        # Verifica se a similaridade atende ao limiar estrito ou ao limiar relaxado
+        return (keywords_strict_similarity >= strict_threshold or summary_strict_similarity >= strict_threshold or
+                keywords_relaxed_similarity >= relaxed_threshold or summary_relaxed_similarity >= relaxed_threshold)
 
     # Filtra o DataFrame usando a função de relevância
     results = df[df.apply(is_relevant, axis=1)]
