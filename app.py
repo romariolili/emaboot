@@ -106,7 +106,8 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
-        data_atualizacao = result['Data elaboração'].values[0].date() if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"  # Formata a data para exibir apenas a data
+        # Formata a data para o formato brasileiro dd/mm/yyyy
+        data_atualizacao = result['Data elaboração'].values[0].strftime('%d/%m/%Y') if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
