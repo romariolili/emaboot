@@ -22,10 +22,10 @@ file_path = 'teste 1.xlsx'
 
 # Verifica se o arquivo existe
 if os.path.exists(file_path):
-    # Carregar a planilha Excel
+    # Carregar a planilha Excel, incluindo a coluna "Data Elaboração"
     df = pd.read_excel(file_path)
 else:
-    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo"])
+    df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo", "Data Elaboração"])
 
 # Emoji de rosto humano
 face_emoji = "😊"
@@ -54,7 +54,7 @@ def search_in_spreadsheet(term):
     results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
-        return results[['Título do documento', 'Link Qualyteam', 'Resumo']].to_dict('records')
+        return results[['Título do documento', 'Link Qualyteam', 'Resumo', 'Data Elaboração']].to_dict('records')
     else:
         return []
 
@@ -70,6 +70,10 @@ def initialize_chat_history():
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    # Limpa o histórico da sessão em uma requisição GET (quando a página é recarregada)
+    if request.method == 'GET':
+        session.pop('chat_history', None)  # Remove o histórico de conversa da sessão
+
     # Inicializa o histórico de chat na sessão
     chat_history = initialize_chat_history()
 
@@ -102,7 +106,9 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0]
         resumo = result['Resumo'].values[0]
+        data_atualizacao = result['Data Elaboração'].values[0]  # Obtém a Data de Elaboração e usa como Data de Atualização
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
+        chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
@@ -338,6 +344,5 @@ template = '''
 </body>
 </html>
 '''
-
 if __name__ == "__main__":
     app.run(debug=True)
