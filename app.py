@@ -106,7 +106,7 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
-        data_atualizacao = result['Data elaboração'].values[0] if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
+        data_atualizacao = result['Data elaboração'].values[0].date() if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"  # Formata a data para exibir apenas a data
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
         chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
@@ -118,7 +118,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com a imagem de fundo, VLibras e Text-to-Speech adicionados
+# Template HTML com a imagem de fundo, VLibras, Text-to-Speech, e Rolagem Automática adicionados
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -312,7 +312,7 @@ template = '''
     <div class="container">
         <div class="chat-box">
             <h1>Emabot da Diplan</h1>
-            <div class="chat-history">
+            <div class="chat-history" id="chat-history">
                 {% for message in chat_history %}
                     <p>{{ message | safe }}</p>
                 {% endfor %}
@@ -339,6 +339,12 @@ template = '''
             } else {
                 alert("Seu navegador não suporta a API de síntese de fala.");
             }
+        }
+
+        // Rolagem automática para o final do histórico de chat
+        window.onload = function() {
+            var chatHistory = document.getElementById("chat-history");
+            chatHistory.scrollTop = chatHistory.scrollHeight;
         }
     </script>
 </body>
