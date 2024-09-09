@@ -39,18 +39,20 @@ def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
     # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    strict_threshold = 75
-    relaxed_threshold = 60
+    strict_threshold = 85  # Aumentado para ser mais rigoroso
 
-    # Função para calcular similaridade usando `token_sort_ratio` para precisão e `partial_ratio` para recall
+    # Função para calcular similaridade usando `token_sort_ratio` para precisão
     def is_relevant(row):
-        keywords_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-        summary_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
-        keywords_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-        summary_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
+        # Verifica a presença direta da palavra-chave normalizada nas colunas relevantes
+        if normalized_term in normalize(str(row['Palavras chaves'])) or normalized_term in normalize(str(row['Resumo'])):
+            return True
+        
+        # Calcula a similaridade apenas se não houver correspondência direta
+        keywords_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        summary_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
 
-        return (keywords_strict_similarity >= strict_threshold or summary_strict_similarity >= strict_threshold or
-                keywords_relaxed_similarity >= relaxed_threshold or summary_relaxed_similarity >= relaxed_threshold)
+        # Retorna verdadeiro se qualquer similaridade estiver acima do limiar
+        return keywords_similarity >= strict_threshold or summary_similarity >= strict_threshold
 
     results = df[df.apply(is_relevant, axis=1)]
 
