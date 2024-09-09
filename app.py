@@ -117,12 +117,7 @@ template = '''
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
 
-    <!-- Script do VLibras -->
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
-
+    <!-- Estilos para a página -->
     <style>
         /* Estilos gerais */
         body {
@@ -262,6 +257,7 @@ template = '''
         </div>
     </div>
 
+    <!-- Conteúdo principal -->
     <div id="loading-overlay">
         <div class="spinner"></div>
         <div>Analisando...</div>
@@ -283,6 +279,12 @@ template = '''
             </form>
         </div>
     </div>
+
+    <!-- Script VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
 
     <script>
         function showLoading() {
