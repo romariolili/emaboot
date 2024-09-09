@@ -30,25 +30,33 @@ else:
 # Emoji de rosto humano
 face_emoji = "😊"
 
+# Função para normalizar o texto, removendo acentuação e convertendo para minúsculas
 def normalize(text):
     return unidecode(text.strip().lower()) if text else ""
 
+# Função de busca na planilha usando uma combinação de similaridade de texto
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
-    strict_threshold = 75
-    relaxed_threshold = 60
+    # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
+    strict_threshold = 75  # Limiar para correspondência estrita
+    relaxed_threshold = 60  # Limiar para correspondência mais relaxada
 
+    # Função para calcular similaridade usando `token_sort_ratio` para precisão e `partial_ratio` para recall
     def is_relevant(row):
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando token_sort_ratio
         keywords_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
         summary_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
-        
+       
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando partial_ratio
         keywords_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
         summary_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
-        
+       
+        # Verifica se a similaridade atende ao limiar estrito ou ao limiar relaxado
         return (keywords_strict_similarity >= strict_threshold or summary_strict_similarity >= strict_threshold or
                 keywords_relaxed_similarity >= relaxed_threshold or summary_relaxed_similarity >= relaxed_threshold)
 
+    # Filtra o DataFrame usando a função de relevância
     results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
@@ -56,18 +64,23 @@ def search_in_spreadsheet(term):
     else:
         return []
 
+# Função para inicializar o histórico de chat na sessão
 def initialize_chat_history():
+    # Inicializa o histórico de chat na sessão se ainda não estiver presente
     if 'chat_history' not in session:
         session['chat_history'] = [
             "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
         ]
     return session['chat_history']
 
+# Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    # Limpa o histórico da sessão em uma requisição GET (quando a página é recarregada)
     if request.method == 'GET':
-        session.pop('chat_history', None)  # Remove o histórico de conversa da sessão
+        session.clear()  # Limpa toda a sessão para garantir o reinício do chat
 
+    # Inicializa o histórico de chat na sessão
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
@@ -85,10 +98,12 @@ def home():
         else:
             chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.")
 
+        # Atualiza o histórico de chat na sessão
         session['chat_history'] = chat_history
 
     return render_template_string(template, chat_history=chat_history)
 
+# Rota para obter o link do documento
 @app.route('/get_link', methods=['GET'])
 def get_link():
     title = request.args.get('title')
@@ -97,17 +112,20 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
+        # Formata a data para o formato brasileiro dd/mm/yyyy
         data_atualizacao = result['Data elaboração'].values[0].strftime('%d/%m/%Y') if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
         chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
-        chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")
+        chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
         chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
+    # Atualiza o histórico de chat na sessão
     session['chat_history'] = chat_history
 
     return render_template_string(template, chat_history=chat_history)
 
+# Template HTML com a imagem de fundo, VLibras, Text-to-Speech, e Rolagem Automática adicionados
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -115,7 +133,15 @@ template = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
+
+    <!-- Script do VLibras -->
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
     <style>
+        /* Estilos gerais */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -131,6 +157,7 @@ template = '''
             align-items: center;
             box-sizing: border-box;
         }
+        /* Container principal */
         .container {
             display: flex;
             max-width: 1200px;
@@ -142,6 +169,7 @@ template = '''
             height: 100%;
             box-sizing: border-box;
         }
+        /* Caixa de Chat - Versão Desktop */
         .chat-box {
             width: 100%;
             max-width: 600px;
@@ -155,6 +183,7 @@ template = '''
             height: auto;
             max-height: 70vh;
         }
+        /* Estilos para histórico de chat */
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
@@ -166,11 +195,13 @@ template = '''
             background-color: rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
         }
+        /* Texto do histórico */
         .chat-history p {
             margin: 5px 0;
             color: white;
             word-wrap: break-word;
         }
+        /* Campo de entrada e botão de envio */
         .user-input {
             display: flex;
             align-items: center;
@@ -200,6 +231,7 @@ template = '''
         .user-input input[type="submit"]:hover {
             background-color: #2980b9;
         }
+        /* Estilos para links */
         a {
             color: white;
             text-decoration: underline;
@@ -207,9 +239,39 @@ template = '''
         a:hover {
             color: #ccc;
         }
+        /* Estilos para o indicador de carregamento */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.5em;
+            color: #333;
+        }
+        /* Animação de rotação */
+        @keyframes spin {
+            from {transform: rotate(0deg);}
+            to {transform: rotate(360deg);}
+        }
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
+    <!-- Inclui o Plugin do VLibras -->
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
@@ -245,9 +307,9 @@ template = '''
         }
 
         function speakText(text) {
-            if ('speechSynthesis' in window) {
+            if ('speechSynthesis' in window) { 
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
+                utterance.lang = 'pt-BR'; 
                 speechSynthesis.speak(utterance);
             } else {
                 alert("Seu navegador não suporta a API de síntese de fala.");
