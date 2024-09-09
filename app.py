@@ -39,12 +39,16 @@ def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
     # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    threshold = 85  # Limiar para similaridade
+    threshold = 70  # Ajusta o limiar para um valor menos rígido
 
-    # Função para calcular similaridade usando `token_sort_ratio` para precisão
+    # Função para verificar se a entrada é relevante
     def is_relevant(row):
-        # Calcula a similaridade da palavra-chave com as palavras-chaves na linha
-        keywords_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
+        # Verifica a presença direta da palavra-chave nas colunas relevantes
+        if normalized_term in normalize(str(row['Palavras chaves'])):
+            return True
+        
+        # Calcula a similaridade se não houver correspondência direta
+        keywords_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
 
         # Retorna verdadeiro se a similaridade estiver acima do limiar
         return keywords_similarity >= threshold
@@ -61,7 +65,7 @@ def search_in_spreadsheet(term):
 def initialize_chat_history():
     # Inicializa o histórico de chat na sessão se ainda não estiver presente
     session['chat_history'] = [
-        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave."
     ]
     return session['chat_history']
 
@@ -79,17 +83,22 @@ def home():
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
 
-        if user_input:
+        # Verifica se a entrada contém mais de uma palavra (indicando uma frase)
+        if len(user_input.split()) > 1:
             chat_history.append(f"{face_emoji}: {user_input}")
-            results = search_in_spreadsheet(user_input)
-            if results:
-                chat_history.append("🤖 Emabot: Documentos encontrados:")
-                for result in results:
-                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
-            else:
-                chat_history.append("🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.")
+            chat_history.append("🤖 Emabot: Por favor, use apenas palavras-chave para realizar a busca.")
         else:
-            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.")
+            if user_input:
+                chat_history.append(f"{face_emoji}: {user_input}")
+                results = search_in_spreadsheet(user_input)
+                if results:
+                    chat_history.append("🤖 Emabot: Documentos encontrados:")
+                    for result in results:
+                        chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
+                else:
+                    chat_history.append("🤖 Emabot: Nenhum documento encontrado com a palavra-chave fornecida.")
+            else:
+                chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave para realizar a busca.")
 
         session['chat_history'] = chat_history
 
