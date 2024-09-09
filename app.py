@@ -66,21 +66,16 @@ def search_in_spreadsheet(term):
 
 # Função para inicializar o histórico de chat na sessão
 def initialize_chat_history():
-    # Inicializa o histórico de chat na sessão se ainda não estiver presente
-    if 'chat_history' not in session:
-        session['chat_history'] = [
-            "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
-        ]
+    # Inicializa o histórico de chat na sessão com apenas a mensagem inicial
+    session['chat_history'] = [
+        "🤖 Emabot: Olá, me chamo Emaboot da Diplan. Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
+    ]
     return session['chat_history']
 
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Limpa o histórico da sessão em uma requisição GET (quando a página é recarregada)
-    if request.method == 'GET':
-        session.pop('chat_history', None)  # Limpa apenas o histórico de chat da sessão
-
-    # Inicializa o histórico de chat na sessão
+    # Sempre inicializa o histórico de chat com a mensagem inicial
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
@@ -98,8 +93,8 @@ def home():
         else:
             chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.")
 
-        # Atualiza o histórico de chat na sessão
-        session['chat_history'] = chat_history
+        # Atualiza o histórico de chat na sessão com a última conversa
+        session['chat_history'] = chat_history[-5:]  # Mantém apenas as últimas 5 mensagens
 
     return render_template_string(template, chat_history=chat_history)
 
@@ -120,8 +115,8 @@ def get_link():
     else:
         chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
-    # Atualiza o histórico de chat na sessão
-    session['chat_history'] = chat_history
+    # Atualiza o histórico de chat na sessão com a última conversa
+    session['chat_history'] = chat_history[-5:]  # Mantém apenas as últimas 5 mensagens
 
     return render_template_string(template, chat_history=chat_history)
 
