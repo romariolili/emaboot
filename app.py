@@ -22,6 +22,7 @@ file_path = 'teste 1.xlsx'
 
 # Verifica se o arquivo existe
 if os.path.exists(file_path):
+    # Carregar a planilha Excel, incluindo a coluna "Data elaboração"
     df = pd.read_excel(file_path)
 else:
     df = pd.DataFrame(columns=["Palavras chaves", "Título do documento", "Link Qualyteam", "Resumo", "Data elaboração"])
@@ -36,18 +37,26 @@ def normalize(text):
 # Função de busca na planilha usando uma combinação de similaridade de texto
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
+
+    # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
     strict_threshold = 75  # Limiar para correspondência estrita
     relaxed_threshold = 60  # Limiar para correspondência mais relaxada
 
+    # Função para calcular similaridade usando `token_sort_ratio` para precisão e `partial_ratio` para recall
     def is_relevant(row):
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando token_sort_ratio
         keywords_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
         summary_strict_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
+        
+        # Calcula a similaridade com 'Palavras chaves' e 'Resumo' usando partial_ratio
         keywords_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
         summary_relaxed_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Resumo'])))
-
+        
+        # Verifica se a similaridade atende ao limiar estrito ou ao limiar relaxado
         return (keywords_strict_similarity >= strict_threshold or summary_strict_similarity >= strict_threshold or
                 keywords_relaxed_similarity >= relaxed_threshold or summary_relaxed_similarity >= relaxed_threshold)
 
+    # Filtra o DataFrame usando a função de relevância
     results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
@@ -57,36 +66,40 @@ def search_in_spreadsheet(term):
 
 # Função para inicializar o histórico de chat na sessão
 def initialize_chat_history():
+    # Inicializa o histórico de chat na sessão se ainda não estiver presente
     if 'chat_history' not in session:
         session['chat_history'] = [
-            {"type": "bot", "message": "Olá, me chamo Emaboot da Diplan.."},
-            {"type": "bot", "message": "Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."}
+            {"message": "🤖 Emabot: Olá, me chamo Emaboot da Diplan.", "delay": 1000},
+            {"message": "🤖 Emabot: Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase.", "delay": 2000}
         ]
     return session['chat_history']
 
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    # Limpa o histórico da sessão em uma requisição GET (quando a página é recarregada)
     if request.method == 'GET':
-        session.pop('chat_history', None)
+        session.pop('chat_history', None)  # Remove o histórico de conversa da sessão
 
+    # Inicializa o histórico de chat na sessão
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
         user_input = request.form['user_input'].strip()
 
         if user_input:
-            chat_history.append({"type": "user", "message": f"{face_emoji}: {user_input}"})
+            chat_history.append({"message": f"{face_emoji}: {user_input}", "delay": 500})
             results = search_in_spreadsheet(user_input)
             if results:
-                chat_history.append({"type": "bot", "message": "Documentos encontrados:"})
+                chat_history.append({"message": "🤖 Emabot: Documentos encontrados:", "delay": 1000})
                 for result in results:
-                    chat_history.append({"type": "bot", "message": f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>"})
+                    chat_history.append({"message": f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>", "delay": 1000})
             else:
-                chat_history.append({"type": "bot", "message": "Nenhum documento encontrado com o termo ou frase fornecida."})
+                chat_history.append({"message": "🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.", "delay": 1000})
         else:
-            chat_history.append({"type": "bot", "message": "Por favor, insira uma palavra-chave ou frase para realizar a busca."})
+            chat_history.append({"message": "🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.", "delay": 1000})
 
+        # Atualiza o histórico de chat na sessão
         session['chat_history'] = chat_history
 
     return render_template_string(template, chat_history=chat_history)
@@ -100,18 +113,20 @@ def get_link():
     if not result.empty:
         link = result['Link Qualyteam'].values[0] if pd.notna(result['Link Qualyteam'].values[0]) else "Link indisponível"
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
+        # Formata a data para o formato brasileiro dd/mm/yyyy
         data_atualizacao = result['Data elaboração'].values[0].strftime('%d/%m/%Y') if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
-        chat_history.append({"type": "bot", "message": f"Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>"})
-        chat_history.append({"type": "bot", "message": f"📅 Data de Atualização: {data_atualizacao}"})
-        chat_history.append({"type": "bot", "message": f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>"})
+        chat_history.append({"message": f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>", "delay": 1000})
+        chat_history.append({"message": f"📅 Data de Atualização: {data_atualizacao}", "delay": 1000})
+        chat_history.append({"message": f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>", "delay": 1000})
     else:
-        chat_history.append({"type": "bot", "message": "Link não encontrado para o título selecionado."})
+        chat_history.append({"message": "🤖 Emabot: Link não encontrado para o título selecionado.", "delay": 1000})
 
+    # Atualiza o histórico de chat na sessão
     session['chat_history'] = chat_history
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML atualizado com a funcionalidade de digitação gradual
+# Template HTML com a animação de digitação
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -120,14 +135,12 @@ template = '''
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
 
-    <!-- Script do VLibras -->
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
 
     <style>
-        /* Estilos gerais */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -143,7 +156,6 @@ template = '''
             align-items: center;
             box-sizing: border-box;
         }
-        /* Container principal */
         .container {
             display: flex;
             max-width: 1200px;
@@ -155,7 +167,6 @@ template = '''
             height: 100%;
             box-sizing: border-box;
         }
-        /* Caixa de Chat - Versão Desktop */
         .chat-box {
             width: 100%;
             max-width: 600px;
@@ -169,7 +180,6 @@ template = '''
             height: auto;
             max-height: 70vh;
         }
-        /* Estilos para histórico de chat */
         .chat-history {
             border: 1px solid #ccc;
             padding: 10px;
@@ -181,13 +191,11 @@ template = '''
             background-color: rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
         }
-        /* Texto do histórico */
         .chat-history p {
             margin: 5px 0;
             color: white;
             word-wrap: break-word;
         }
-        /* Campo de entrada e botão de envio */
         .user-input {
             display: flex;
             align-items: center;
@@ -224,10 +232,20 @@ template = '''
         a:hover {
             color: #ccc;
         }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        .typing {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: .15em solid orange;
+            animation: typing 2s steps(30, end), blink-caret .5s step-end infinite;
+        }
     </style>
 </head>
 <body>
-    <!-- Inclui o Plugin do VLibras -->
     <div vw class="enabled">
         <div vw-access-button class="active"></div>
         <div vw-plugin-wrapper>
@@ -235,17 +253,12 @@ template = '''
         </div>
     </div>
 
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <div>Analisando...</div>
-    </div>
-
     <div class="container">
         <div class="chat-box">
             <h1>Emabot da Diplan</h1>
             <div class="chat-history" id="chat-history">
                 {% for message in chat_history %}
-                    <p id="msg{{ loop.index }}" style="display: none;">{{ message['message'] | safe }}</p>
+                    <p style="animation: type {{ message['message']|length * 50 }}ms steps({{ message['message']|length }}), blink-caret .75s step-end infinite;">{{ message['message'] }}</p>
                 {% endfor %}
             </div>
             <form method="post" action="/" onsubmit="showLoading()">
@@ -263,31 +276,19 @@ template = '''
         }
 
         function speakText(text) {
-            if ('speechSynthesis' in window) {
+            if ('speechSynthesis' in window) { 
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';
+                utterance.lang = 'pt-BR';  
                 speechSynthesis.speak(utterance);
             } else {
                 alert("Seu navegador não suporta a API de síntese de fala.");
             }
         }
 
-        // Função para simular digitação
-        function typeMessage() {
-            let delay = 500; // Delay inicial entre cada mensagem
-            {% for message in chat_history %}
-            setTimeout(() => {
-                document.getElementById("msg{{ loop.index }}").style.display = "block";
-                chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll até o final
-            }, delay);
-            delay += {{ message['message'].length * 50 }}; // Aumenta o delay com base no comprimento da mensagem
-            {% endfor %}
-        }
-
-        // Chama a função de digitação ao carregar a página
         window.onload = function() {
-            typeMessage();
-        };
+            var chatHistory = document.getElementById("chat-history");
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
     </script>
 </body>
 </html>
