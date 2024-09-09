@@ -65,9 +65,9 @@ def search_in_spreadsheet(term):
         return []
 
 # Função para inicializar o histórico de chat na sessão
-def initialize_chat_history():
-    # Inicializa o histórico de chat na sessão se ainda não estiver presente
-    if 'chat_history' not in session:
+def initialize_chat_history(reset=False):
+    # Inicializa o histórico de chat na sessão se ainda não estiver presente ou se reset for True
+    if 'chat_history' not in session or reset:
         session['chat_history'] = [
             "🤖 Emabot: Olá, me chamo Emaboot da Diplan...",
             "🤖 Emabot: Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
@@ -77,7 +77,10 @@ def initialize_chat_history():
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Inicializa o histórico de chat na sessão
+    # Se for uma requisição GET (recarregar página), reseta o histórico de chat
+    if request.method == 'GET':
+        initialize_chat_history(reset=True)  # Reinicia o histórico de chat
+
     chat_history = initialize_chat_history()
 
     if request.method == 'POST':
@@ -122,7 +125,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML atualizado
+# Template HTML
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -130,14 +133,13 @@ template = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
-
-    <!-- Script do VLibras -->
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
 
     <style>
+        /* Estilos gerais */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -228,30 +230,6 @@ template = '''
         }
         a:hover {
             color: #ccc;
-        }
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            font-size: 1.5em;
-            color: #333;
-        }
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        .typing {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid;
-            animation: typing 2s steps(30, end), blink-caret .5s step-end infinite;
         }
     </style>
 </head>
