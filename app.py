@@ -10,7 +10,6 @@ from flask import Flask, request, render_template_string, session
 import pandas as pd
 import os
 from unidecode import unidecode
-from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
@@ -38,23 +37,8 @@ def normalize(text):
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
-    # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    threshold = 70  # Ajusta o limiar para um valor menos rígido
-
-    # Função para verificar se a entrada é relevante
-    def is_relevant(row):
-        # Verifica a presença direta da palavra-chave nas colunas relevantes
-        if normalized_term in normalize(str(row['Palavras chaves'])):
-            return True
-        
-        # Calcula a similaridade se não houver correspondência direta
-        keywords_similarity = fuzz.partial_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-
-        # Retorna verdadeiro se a similaridade estiver acima do limiar
-        return keywords_similarity >= threshold
-
-    # Filtra o DataFrame apenas pelas linhas relevantes
-    results = df[df.apply(is_relevant, axis=1)]
+    # Filtra as linhas onde a palavra-chave normalizada está contida em "Palavras chaves"
+    results = df[df['Palavras chaves'].apply(lambda x: normalized_term in normalize(str(x)))]
 
     if not results.empty:
         return results[['Título do documento', 'Link Qualyteam', 'Resumo', 'Data elaboração']].to_dict('records')
