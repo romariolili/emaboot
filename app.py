@@ -34,26 +34,22 @@ face_emoji = "😊"
 def normalize(text):
     return unidecode(text.strip().lower()) if text else ""
 
-# Função de busca na planilha usando uma combinação de similaridade de texto
+# Função de busca na planilha focada em palavras-chave
 def search_in_spreadsheet(term):
     normalized_term = normalize(term)
 
     # Define uma pontuação mínima de similaridade para considerar uma correspondência relevante
-    strict_threshold = 85  # Aumentado para ser mais rigoroso
+    threshold = 85  # Limiar para similaridade
 
     # Função para calcular similaridade usando `token_sort_ratio` para precisão
     def is_relevant(row):
-        # Verifica a presença direta da palavra-chave normalizada nas colunas relevantes
-        if normalized_term in normalize(str(row['Palavras chaves'])) or normalized_term in normalize(str(row['Resumo'])):
-            return True
-        
-        # Calcula a similaridade apenas se não houver correspondência direta
+        # Calcula a similaridade da palavra-chave com as palavras-chaves na linha
         keywords_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Palavras chaves'])))
-        summary_similarity = fuzz.token_sort_ratio(normalized_term, normalize(str(row['Resumo'])))
 
-        # Retorna verdadeiro se qualquer similaridade estiver acima do limiar
-        return keywords_similarity >= strict_threshold or summary_similarity >= strict_threshold
+        # Retorna verdadeiro se a similaridade estiver acima do limiar
+        return keywords_similarity >= threshold
 
+    # Filtra o DataFrame apenas pelas linhas relevantes
     results = df[df.apply(is_relevant, axis=1)]
 
     if not results.empty:
