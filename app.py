@@ -69,8 +69,8 @@ def initialize_chat_history():
     # Inicializa o histórico de chat na sessão se ainda não estiver presente
     if 'chat_history' not in session:
         session['chat_history'] = [
-            {"message": "🤖 Emabot: Olá, me chamo Emaboot da Diplan.", "delay": 1000},
-            {"message": "🤖 Emabot: Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase.", "delay": 2000}
+            "🤖 Emabot: Olá, me chamo Emaboot da Diplan...",
+            "🤖 Emabot: Sou sua assistente de busca de documentos. Como posso ajudar? Digite uma palavra-chave ou uma frase."
         ]
     return session['chat_history']
 
@@ -88,16 +88,16 @@ def home():
         user_input = request.form['user_input'].strip()
 
         if user_input:
-            chat_history.append({"message": f"{face_emoji}: {user_input}", "delay": 500})
+            chat_history.append(f"{face_emoji}: {user_input}")
             results = search_in_spreadsheet(user_input)
             if results:
-                chat_history.append({"message": "🤖 Emabot: Documentos encontrados:", "delay": 1000})
+                chat_history.append("🤖 Emabot: Documentos encontrados:")
                 for result in results:
-                    chat_history.append({"message": f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>", "delay": 1000})
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
             else:
-                chat_history.append({"message": "🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.", "delay": 1000})
+                chat_history.append("🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.")
         else:
-            chat_history.append({"message": "🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.", "delay": 1000})
+            chat_history.append("🤖 Emabot: Por favor, insira uma palavra-chave ou frase para realizar a busca.")
 
         # Atualiza o histórico de chat na sessão
         session['chat_history'] = chat_history
@@ -115,18 +115,18 @@ def get_link():
         resumo = result['Resumo'].values[0] if pd.notna(result['Resumo'].values[0]) else "Resumo não disponível"
         # Formata a data para o formato brasileiro dd/mm/yyyy
         data_atualizacao = result['Data elaboração'].values[0].strftime('%d/%m/%Y') if pd.notna(result['Data elaboração'].values[0]) else "Data não disponível"
-        chat_history.append({"message": f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>", "delay": 1000})
-        chat_history.append({"message": f"📅 Data de Atualização: {data_atualizacao}", "delay": 1000})
-        chat_history.append({"message": f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>", "delay": 1000})
+        chat_history.append(f"🤖 Emabot: Aqui está o link para '{title}': <a href='{link}' target='_blank'>{link}</a>")
+        chat_history.append(f"📅 Data de Atualização: {data_atualizacao}")  # Exibe como Data de Atualização
+        chat_history.append(f"📄 Resumo: {resumo} <button onclick='speakText(`{resumo}`)'>🔊 Ouvir</button>")
     else:
-        chat_history.append({"message": "🤖 Emabot: Link não encontrado para o título selecionado.", "delay": 1000})
+        chat_history.append("🤖 Emabot: Link não encontrado para o título selecionado.")
 
     # Atualiza o histórico de chat na sessão
     session['chat_history'] = chat_history
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com a animação de digitação
+# Template HTML com a animação de digitação e correção dos links
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -135,6 +135,7 @@ template = '''
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emabot da Diplan</title>
 
+    <!-- Script do VLibras -->
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
@@ -232,15 +233,28 @@ template = '''
         a:hover {
             color: #ccc;
         }
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.5em;
+            color: #333;
+        }
         @keyframes typing {
             from { width: 0; }
             to { width: 100%; }
         }
         .typing {
-            width: 100%;
-            white-space: nowrap;
             overflow: hidden;
-            border-right: .15em solid orange;
+            white-space: nowrap;
+            border-right: 3px solid;
             animation: typing 2s steps(30, end), blink-caret .5s step-end infinite;
         }
     </style>
@@ -253,12 +267,17 @@ template = '''
         </div>
     </div>
 
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div>Analisando...</div>
+    </div>
+
     <div class="container">
         <div class="chat-box">
             <h1>Emabot da Diplan</h1>
             <div class="chat-history" id="chat-history">
                 {% for message in chat_history %}
-                    <p style="animation: type {{ message['message']|length * 50 }}ms steps({{ message['message']|length }}), blink-caret .75s step-end infinite;">{{ message['message'] }}</p>
+                    <p>{{ message | safe }}</p>
                 {% endfor %}
             </div>
             <form method="post" action="/" onsubmit="showLoading()">
@@ -276,9 +295,9 @@ template = '''
         }
 
         function speakText(text) {
-            if ('speechSynthesis' in window) { 
+            if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'pt-BR';  
+                utterance.lang = 'pt-BR';
                 speechSynthesis.speak(utterance);
             } else {
                 alert("Seu navegador não suporta a API de síntese de fala.");
@@ -296,4 +315,3 @@ template = '''
 
 if __name__ == "__main__":
     app.run(debug=True)
-
