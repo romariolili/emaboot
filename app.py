@@ -77,10 +77,6 @@ def initialize_chat_history():
 # Rota principal
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    # Limpa o histórico da sessão em uma requisição GET (quando a página é recarregada)
-    if request.method == 'GET':
-        session.pop('chat_history', None)  # Remove o histórico de conversa da sessão
-
     # Inicializa o histórico de chat na sessão
     chat_history = initialize_chat_history()
 
@@ -93,7 +89,7 @@ def home():
             if results:
                 chat_history.append("🤖 Emabot: Documentos encontrados:")
                 for result in results:
-                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'>{result['Título do documento']}</a>")
+                    chat_history.append(f"📄 <a href='/get_link?title={result['Título do documento']}'> {result['Título do documento']} </a>")
             else:
                 chat_history.append("🤖 Emabot: Nenhum documento encontrado com o termo ou frase fornecida.")
         else:
@@ -126,7 +122,7 @@ def get_link():
 
     return render_template_string(template, chat_history=chat_history)
 
-# Template HTML com a animação de digitação e correção dos links
+# Template HTML atualizado
 template = '''
 <!DOCTYPE html>
 <html lang="pt-br">
