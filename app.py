@@ -72,6 +72,8 @@ def initialize_chat_history():
 def home():
     # Sempre inicializa o histórico de chat ao carregar a página
     if request.method == 'GET':
+        # Limpa o histórico de chat na sessão
+        session.pop('chat_history', None)
         initialize_chat_history()
 
     chat_history = session.get('chat_history', [])
